@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Engine.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{c6a367f1-c8ee-4450-9d7b-07568170e494}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{8ce46fae-12f0-4bcc-ba31-8cc3311e6e3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Fragment">
+      <UniqueIdentifier>{0accde26-97e1-4e93-9b62-115b0eaf42ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Vertex">
+      <UniqueIdentifier>{d8f3855b-16cc-4775-ae0f-601dd5d20217}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Bitmap Loader.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Simple.h">
+      <Filter>Shaders\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader Loader.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJ Loader.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Math.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,88 @@
+#
+## Alias OBJ Material File
+# Exported from SketchUp, (c) 2000-2006 Google, Inc.
+
+newmtl material_61
+Ka 0.000000 0.000000 0.000000
+Kd 0.780392 0.654902 0.372549
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_61.bmp
+
+newmtl material_62
+Ka 0.000000 0.000000 0.000000
+Kd 0.431373 0.768627 0.035294
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_62.bmp
+
+newmtl material_63
+Ka 0.000000 0.000000 0.000000
+Kd 0.929412 0.823529 0.439216
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_63.bmp
+
+newmtl material_64
+Ka 0.000000 0.000000 0.000000
+Kd 0.129412 0.364706 0.219608
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_64.bmp
+
+newmtl material_66
+Ka 0.000000 0.000000 0.000000
+Kd 0.741176 0.686275 0.521569
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_66.bmp
+
+newmtl material_65
+Ka 0.000000 0.000000 0.000000
+Kd 0.823529 0.729412 0.419608
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_65.bmp
+
+newmtl material_67
+Ka 0.000000 0.000000 0.000000
+Kd 0.925490 0.823529 0.474510
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_67.bmp
+
+newmtl material_54
+Ka 0.000000 0.000000 0.000000
+Kd 0.290196 0.501961 0.094118
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_54.bmp
+
+newmtl material_60
+Ka 0.000000 0.000000 0.000000
+Kd 0.125490 0.368627 0.223529
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_60.bmp
+
+newmtl material_57
+Ka 0.000000 0.000000 0.000000
+Kd 0.905882 0.788235 0.447059
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_57.bmp
+
+newmtl material_59
+Ka 0.000000 0.000000 0.000000
+Kd 0.929412 0.815686 0.478431
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_59.bmp
+
+newmtl material_56
+Ka 0.000000 0.000000 0.000000
+Kd 0.011765 0.321569 0.050980
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_56.bmp
+
+newmtl material_58
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.188235 0.000000
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_58.bmp
+
+newmtl material_55
+Ka 0.000000 0.000000 0.000000
+Kd 0.109804 0.396078 0.035294
+Ks 0.330000 0.330000 0.330000
+map_Kd Saria/material_55.bmp
+
