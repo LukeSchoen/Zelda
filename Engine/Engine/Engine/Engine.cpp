@@ -51,7 +51,8 @@ GLuint gCBO = 0;
 //Storage for texture
 GLuint texture[1];
 
-
+//Model References
+OBJ saria;
 
 
 #pragma endregion
@@ -89,7 +90,7 @@ void initTextures()
   SDL_Surface *tex[1];
 
   /* Load The Bitmap into Memory */
-  if ((tex[0] = SDL_LoadBMP("C:\\Users\\Luke\\Desktop\\Zelda\\Game\\Assets\\Saria\\Saria\\material_66.bmp")))
+  if ((tex[0] = SDL_LoadBMP("..\\..\\..\\Game\\Assets\\Saria\\Saria\\material_66.bmp")))
   {
     glGenTextures(1, &texture[0]);
     glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -105,8 +106,8 @@ void initTextures()
 
 bool init()
 {
-  OBJ &saria = *loadOBJ("C:\\Users\\Luke\\Desktop\\Zelda\\Game\\Assets\\Saria\\Saria.obj");
-
+  saria = loadOBJ("..\\..\\..\\game\\Assets\\Saria\\Saria.obj");
+  
   //Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
   {
@@ -182,7 +183,7 @@ bool initGL()
 
   //Get vertex source
   char *vertShader[1];
-  vertShader[0] = LoadShader("C:\\Users\\Luke\\Desktop\\Zelda\\Game\\Assets\\Shaders\\Vert\\simple.vert");
+  vertShader[0] = LoadShader("..\\..\\..\\game\\Assets\\Shaders\\Vert\\simple.vert");
 
   //Set vertex source
   glShaderSource(vertexShader, 1, vertShader, NULL);
@@ -208,7 +209,7 @@ bool initGL()
 
   //Get fragment source
   char *fragShader[1];
-  fragShader[0] = LoadShader("C:\\Users\\Luke\\Desktop\\Zelda\\Game\\Assets\\Shaders\\frag\\simple.frag");
+  fragShader[0] = LoadShader("..\\..\\..\\Game\\Assets\\Shaders\\frag\\simple.frag");
   
   //Set fragment source
   glShaderSource(fragmentShader, 1, fragShader, NULL);
@@ -255,8 +256,25 @@ bool initGL()
 
   //Initialize clear color
   glClearColor(0.f, 0.f, 0.f, 1.f);
+  
+  GLfloat *vertexData = new GLfloat[saria.faceCount * 9];
 
-  static const GLfloat vertexData[] =
+  for (int i = 0; i < saria.faceCount ; i++)
+  {
+    vertexData[i * 9 + 0] = saria.polys[i].verticies[0].x;
+    vertexData[i * 9 + 1] = saria.polys[i].verticies[0].y;
+    vertexData[i * 9 + 2] = saria.polys[i].verticies[0].z;
+
+    vertexData[i * 9 + 3] = saria.polys[i].verticies[1].x;
+    vertexData[i * 9 + 4] = saria.polys[i].verticies[1].y;
+    vertexData[i * 9 + 5] = saria.polys[i].verticies[1].z;
+    
+    vertexData[i * 9 + 6] = saria.polys[i].verticies[2].x;
+    vertexData[i * 9 + 7] = saria.polys[i].verticies[2].y;
+    vertexData[i * 9 + 8] = saria.polys[i].verticies[2].z;
+  }
+  
+  static const GLfloat _vertexData[] =
   {
     -1.0f, -1.0f, -1.0f,
     -1.0f, -1.0f, 1.0f,
@@ -337,7 +355,7 @@ bool initGL()
   };
   glGenBuffers(1, &gVBO);
   glBindBuffer(GL_ARRAY_BUFFER, gVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, saria.faceCount * 9 * sizeof(float), vertexData, GL_STATIC_DRAW);
 
   glGenBuffers(1, &gCBO);
   glBindBuffer(GL_ARRAY_BUFFER, gCBO);
@@ -369,20 +387,21 @@ void render()
   glUseProgram(gProgramID);
 
   // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-  glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+  glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 24000.0f);
 
   // Camera matrix
   glm::mat4 View = glm::lookAt(
-    glm::vec3(4, 3, -3), // Camera is at (4,3,-3), in World Space
+    glm::vec3(50, 40, -40), // Camera is at (4,3,-3), in World Space
     glm::vec3(0, 0, 0), // and looks at the origin
     glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
     );
 
   // Model matrix : an identity matrix (model will be at the origin)
   glm::mat4 Model = glm::mat4(1.0f);
+  Model = glm::translate(Model, glm::vec3(0.0, -20.0, 0.0));
 
   static float rot = 0.0;
-  rot = rot + 0.01;
+  rot = rot + 0.0001;
   Model = glm::rotate(Model, rot, glm::vec3(0.0, 1.0, 0.0));
   
 
@@ -418,7 +437,7 @@ void render()
     );
 
   // Draw the triangle !
-  glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
+  glDrawArrays(GL_TRIANGLES, 0, saria.faceCount * 3); // 12*3 indices starting at 0 -> 12 triangles
 
   glDisableVertexAttribArray(0);
   glDisableVertexAttribArray(1);

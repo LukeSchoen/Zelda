@@ -18,11 +18,10 @@ struct Triangle
 struct OBJ
 {
   uint32_t faceCount = 0;
-  Vertex *verts;
   Triangle *polys;
 };
 
-OBJ* loadOBJ(char* path)
+OBJ loadOBJ(char* path)
 {
   //Variables
   uint32_t fileSize = 0;
@@ -74,8 +73,7 @@ OBJ* loadOBJ(char* path)
   }
 
   //Create OBJ
-  OBJ *modelData = new OBJ;
-  OBJ &model = *modelData;
+  OBJ model;
   Vertex *OBJ_Verts = new Vertex[vertCount];
   model.polys = new Triangle[faceCount];
 
@@ -147,5 +145,5 @@ OBJ* loadOBJ(char* path)
     }
   }
   delete[] OBJ_Verts;
-  return modelData;
+  return model;
 }
