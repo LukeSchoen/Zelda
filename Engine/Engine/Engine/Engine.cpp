@@ -14,6 +14,8 @@
 #include "OBJ Loader.h"
 #include "Shader Loader.h"
 
+#include "Controls.h"
+
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 
@@ -25,6 +27,27 @@
 
 #pragma endregion
 
+#pragma region strucs
+
+struct VertexObject
+{
+  GLint textureID = 0;
+  GLuint vertPosDataGLPtr = 0;
+  GLuint texPosDataGLPtr = 0;
+  uint32_t verticeCount = 0;
+  GLfloat *vertPosData;
+  GLfloat *texPosData;
+};
+
+struct RenderObject
+{
+  glm::mat4 modelMatrix;
+  VertexObject *vertexObjects;
+  uint32_t vertexObjectCount = 0;
+};
+
+#pragma endregion
+
 #pragma region globals
 
 //Program name
@@ -32,6 +55,7 @@ const char* PROGRAM_NAME = "ZELDA";
 //Window resolution
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+const bool FULL_SCEEN = true;
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -42,72 +66,92 @@ SDL_GLContext gContext;
 //Graphics program
 GLuint gProgramID = 0;
 
-GLint gLocVertexPos4D = -1;
+//Uniform Locations
 GLuint gLocMVP = -1;
-
-GLuint gVBO = 0;
-GLuint gCBO = 0;
-
-//Storage for texture
-GLuint texture[1];
+GLint gLocVertexPos4D = -1;
+GLuint gLocTexture = -1;
 
 //Model References
-OBJ saria;
+OBJ kakrikoOBJ;
+MTL kakrikoMTL;
+RenderObject kakrikoRenderObject;
 
+OBJ windMillOBJ;
+MTL windMillMTL;
+RenderObject windMillRenderObject;
 
 #pragma endregion
 
 #pragma region prototypes
 
-//Starts up SDL, creates window, and initializes OpenGL
 bool init();
 
-//Initializes rendering program and clear color
 bool initGL();
 
-//Input handler
-void handleKeys(unsigned char key, int x, int y);
-
-//Per frame update
-void update();
-
-//Render quad to the screen
 void render();
 
-//Frees media and shuts down SDL
 void close();
 
-//Shader loading utility programs
 void printProgramLog(GLuint program);
 void printShaderLog(GLuint shader);
 
 #pragma endregion
 
-
-void initTextures()
+void RenderRenderObject(RenderObject &RenObj)
 {
-  /* Create storage space for the texture */
-  SDL_Surface *tex[1];
-
-  /* Load The Bitmap into Memory */
-  if ((tex[0] = SDL_LoadBMP("..\\..\\..\\Game\\Assets\\Saria\\Saria\\material_66.bmp")))
+  for (int VertexObjectID = 0; VertexObjectID < RenObj.vertexObjectCount; VertexObjectID++)
   {
-    glGenTextures(1, &texture[0]);
-    glBindTexture(GL_TEXTURE_2D, texture[0]);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, tex[0]->w, tex[0]->h, 0, GL_BGR, GL_UNSIGNED_BYTE, tex[0]->pixels);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindBuffer(GL_ARRAY_BUFFER, RenObj.vertexObjects[VertexObjectID].vertPosDataGLPtr);
+    glVertexAttribPointer(
+      0,                  // attribute number. must match the layout in the shader.
+      3,                  // count
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      (void*)0            // array buffer offset
+      );
+
+    glBindBuffer(GL_ARRAY_BUFFER, RenObj.vertexObjects[VertexObjectID].texPosDataGLPtr);
+    glVertexAttribPointer(
+      1,                  // attribute number. must match the layout in the shader.
+      2,                  // count
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      (void*)0            // array buffer offset
+      );
+
+    glBindTexture(GL_TEXTURE_2D, RenObj.vertexObjects[VertexObjectID].textureID);
+    glDrawArrays(GL_TRIANGLES, 0, RenObj.vertexObjects[VertexObjectID].verticeCount);
+  }
+}
+
+void InitializeMaterialLibrary(MTL &mtl, char * basePath)
+{
+  SDL_Surface *tex;
+  char fullMatPath [1024];
+  memcpy(fullMatPath, basePath, strlen(basePath) + 1); // initialize the base path
+
+  for (int matID = 0; matID < mtl.materialCount ; matID++)
+  {
+    memcpy(fullMatPath + strlen(basePath), mtl.materials[matID].path, strlen(mtl.materials[matID].path) + 1); // append the local material path
+
+    if ((tex = SDL_LoadBMP(fullMatPath)))
+    {
+      glGenTextures(1, &(mtl.materials[matID].textureID));
+      glBindTexture(GL_TEXTURE_2D, mtl.materials[matID].textureID);
+      glTexImage2D(GL_TEXTURE_2D, 0, 3, tex->w, tex->h, 0, GL_BGR, GL_UNSIGNED_BYTE, tex->pixels);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
   }
 
-  /* Free up memory */
-  if (tex[0])
-    SDL_FreeSurface(tex[0]);
+  if (tex)
+    SDL_FreeSurface(tex);
 }
 
 bool init()
 {
-  saria = loadOBJ("..\\..\\..\\game\\Assets\\Saria\\Saria.obj");
-  
   //Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
   {
@@ -149,7 +193,7 @@ bool init()
     return false;
   }
 
-  //Use Vsync
+  //Enable Vsync
   if (SDL_GL_SetSwapInterval(1) < 0)
   {
     printf("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
@@ -162,20 +206,20 @@ bool init()
     return false;
   }
 
-  //Success
+  //Successful init
   return true;
 }
 
 bool initGL()
 {
-  //Depth Test
+  //Depth Testing
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
-  //Enable Multisampling
+  //Multi sampling
   glEnable(GL_MULTISAMPLE);
 
-  //Generate program
+  //Generate shader program
   gProgramID = glCreateProgram();
 
   //Create vertex shader
@@ -183,7 +227,7 @@ bool initGL()
 
   //Get vertex source
   char *vertShader[1];
-  vertShader[0] = LoadShader("..\\..\\..\\game\\Assets\\Shaders\\Vert\\simple.vert");
+  vertShader[0] = LoadShader("..\\..\\..\\game\\Assets\\Shaders\\Vert\\texture.vert");
 
   //Set vertex source
   glShaderSource(vertexShader, 1, vertShader, NULL);
@@ -209,7 +253,7 @@ bool initGL()
 
   //Get fragment source
   char *fragShader[1];
-  fragShader[0] = LoadShader("..\\..\\..\\Game\\Assets\\Shaders\\frag\\simple.frag");
+  fragShader[0] = LoadShader("..\\..\\..\\Game\\Assets\\Shaders\\frag\\texture.frag");
   
   //Set fragment source
   glShaderSource(fragmentShader, 1, fragShader, NULL);
@@ -251,194 +295,121 @@ bool initGL()
     return false;
   }
 
-  //Model View Projection Shader Parametre
+  //Model View Projection Shader parameter
   gLocMVP = glGetUniformLocation(gProgramID, "MVP");
 
+  //Texture sampler
+  gLocTexture = glGetUniformLocation(gProgramID, "TextureSampler");
+
   //Initialize clear color
-  glClearColor(0.f, 0.f, 0.f, 1.f);
+  glClearColor(0.f, 0.75, 1.0, 1.f);
   
-  GLfloat *vertexData = new GLfloat[saria.faceCount * 9];
-
-  for (int i = 0; i < saria.faceCount ; i++)
-  {
-    vertexData[i * 9 + 0] = saria.polys[i].verticies[0].x;
-    vertexData[i * 9 + 1] = saria.polys[i].verticies[0].y;
-    vertexData[i * 9 + 2] = saria.polys[i].verticies[0].z;
-
-    vertexData[i * 9 + 3] = saria.polys[i].verticies[1].x;
-    vertexData[i * 9 + 4] = saria.polys[i].verticies[1].y;
-    vertexData[i * 9 + 5] = saria.polys[i].verticies[1].z;
-    
-    vertexData[i * 9 + 6] = saria.polys[i].verticies[2].x;
-    vertexData[i * 9 + 7] = saria.polys[i].verticies[2].y;
-    vertexData[i * 9 + 8] = saria.polys[i].verticies[2].z;
-  }
-  
-  static const GLfloat _vertexData[] =
-  {
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, 1.0f, -1.0f,
-    1.0f, -1.0f, 1.0f,
-    -1.0f, -1.0f, -1.0f,
-    1.0f, -1.0f, -1.0f,
-    1.0f, 1.0f, -1.0f,
-    1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f, -1.0f,
-    1.0f, -1.0f, 1.0f,
-    -1.0f, -1.0f, 1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, 1.0f, 1.0f,
-    -1.0f, -1.0f, 1.0f,
-    1.0f, -1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f, -1.0f, -1.0f,
-    1.0f, 1.0f, -1.0f,
-    1.0f, -1.0f, -1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f, -1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, -1.0f,
-    -1.0f, 1.0f, -1.0f,
-    1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f, -1.0f,
-    -1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
-    1.0f, -1.0f, 1.0f
-  };
-
-  static const GLfloat colorData[] =
-  {
-    0.583f, 0.771f, 0.014f,
-    0.609f, 0.115f, 0.436f,
-    0.327f, 0.483f, 0.844f,
-    0.822f, 0.569f, 0.201f,
-    0.435f, 0.602f, 0.223f,
-    0.310f, 0.747f, 0.185f,
-    0.597f, 0.770f, 0.761f,
-    0.559f, 0.436f, 0.730f,
-    0.359f, 0.583f, 0.152f,
-    0.483f, 0.596f, 0.789f,
-    0.559f, 0.861f, 0.639f,
-    0.195f, 0.548f, 0.859f,
-    0.014f, 0.184f, 0.576f,
-    0.771f, 0.328f, 0.970f,
-    0.406f, 0.615f, 0.116f,
-    0.676f, 0.977f, 0.133f,
-    0.971f, 0.572f, 0.833f,
-    0.140f, 0.616f, 0.489f,
-    0.997f, 0.513f, 0.064f,
-    0.945f, 0.719f, 0.592f,
-    0.543f, 0.021f, 0.978f,
-    0.279f, 0.317f, 0.505f,
-    0.167f, 0.620f, 0.077f,
-    0.347f, 0.857f, 0.137f,
-    0.055f, 0.953f, 0.042f,
-    0.714f, 0.505f, 0.345f,
-    0.783f, 0.290f, 0.734f,
-    0.722f, 0.645f, 0.174f,
-    0.302f, 0.455f, 0.848f,
-    0.225f, 0.587f, 0.040f,
-    0.517f, 0.713f, 0.338f,
-    0.053f, 0.959f, 0.120f,
-    0.393f, 0.621f, 0.362f,
-    0.673f, 0.211f, 0.457f,
-    0.820f, 0.883f, 0.371f,
-    0.982f, 0.099f, 0.879f
-  };
-  glGenBuffers(1, &gVBO);
-  glBindBuffer(GL_ARRAY_BUFFER, gVBO);
-  glBufferData(GL_ARRAY_BUFFER, saria.faceCount * 9 * sizeof(float), vertexData, GL_STATIC_DRAW);
-
-  glGenBuffers(1, &gCBO);
-  glBindBuffer(GL_ARRAY_BUFFER, gCBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(colorData), colorData, GL_STATIC_DRAW);
-
   //success
   return true;
 }
 
-void handleKeys(unsigned char key, int x, int y)
+RenderObject GenerateRenderObject(OBJ &model, MTL &materials)
 {
-  if (key == 'q')
-  {
-    //example
-  }
-}
+  RenderObject object;
+  object.modelMatrix = glm::mat4();
 
-void update()
-{
-  //No per frame update needed
+  object.vertexObjectCount = materials.materialCount;
+  object.vertexObjects = new VertexObject[materials.materialCount];
+
+  for (int objID = 0; objID < materials.materialCount; objID++)
+  {
+    //Count faces for this material
+    uint32_t texID = materials.materials[objID].textureID;
+    uint32_t faceCount = 0;
+    for (int faceID = 0; faceID < model.faceCount ; faceID++)
+      if (texID == model.polys[faceID].textureID) faceCount++;
+
+    //create vertexObject for this material
+    object.vertexObjects[objID].textureID = texID;
+    object.vertexObjects[objID].vertPosData = new GLfloat[faceCount * 9];
+    object.vertexObjects[objID].texPosData = new GLfloat[faceCount * 6];
+    uint32_t currentFace = 0;
+    for (int faceID = 0; faceID < model.faceCount; faceID++)
+    {
+      if (texID == model.polys[faceID].textureID)
+      {
+        object.vertexObjects[objID].vertPosData[currentFace * 9 + 0] = model.polys[faceID].verticies[0].x;
+        object.vertexObjects[objID].vertPosData[currentFace * 9 + 1] = model.polys[faceID].verticies[0].y;
+        object.vertexObjects[objID].vertPosData[currentFace * 9 + 2] = model.polys[faceID].verticies[0].z;
+
+        object.vertexObjects[objID].texPosData[currentFace * 6 + 0] = model.polys[faceID].verticies[0].u;
+        object.vertexObjects[objID].texPosData[currentFace * 6 + 1] = model.polys[faceID].verticies[0].v;
+
+        object.vertexObjects[objID].vertPosData[currentFace * 9 + 3] = model.polys[faceID].verticies[1].x;
+        object.vertexObjects[objID].vertPosData[currentFace * 9 + 4] = model.polys[faceID].verticies[1].y;
+        object.vertexObjects[objID].vertPosData[currentFace * 9 + 5] = model.polys[faceID].verticies[1].z;
+
+        object.vertexObjects[objID].texPosData[currentFace * 6 + 2] = model.polys[faceID].verticies[1].u;
+        object.vertexObjects[objID].texPosData[currentFace * 6 + 3] = model.polys[faceID].verticies[1].v;
+        
+        object.vertexObjects[objID].vertPosData[currentFace * 9 + 6] = model.polys[faceID].verticies[2].x;
+        object.vertexObjects[objID].vertPosData[currentFace * 9 + 7] = model.polys[faceID].verticies[2].y;
+        object.vertexObjects[objID].vertPosData[currentFace * 9 + 8] = model.polys[faceID].verticies[2].z;
+
+        object.vertexObjects[objID].texPosData[currentFace * 6 + 4] = model.polys[faceID].verticies[2].u;
+        object.vertexObjects[objID].texPosData[currentFace * 6 + 5] = model.polys[faceID].verticies[2].v;
+        object.vertexObjects[objID].verticeCount+=3;
+        currentFace++;
+      }
+    }
+
+    //upload vertexObject to OpenGL for this material
+    glGenBuffers(1, &object.vertexObjects[objID].vertPosDataGLPtr);
+    glBindBuffer(GL_ARRAY_BUFFER, object.vertexObjects[objID].vertPosDataGLPtr);
+    glBufferData(GL_ARRAY_BUFFER, faceCount * 9 * sizeof(GLfloat), object.vertexObjects[objID].vertPosData, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &object.vertexObjects[objID].texPosDataGLPtr);
+    glBindBuffer(GL_ARRAY_BUFFER, object.vertexObjects[objID].texPosDataGLPtr);
+    glBufferData(GL_ARRAY_BUFFER, faceCount * 6 * sizeof(GLfloat), object.vertexObjects[objID].texPosData, GL_STATIC_DRAW);
+
+  }
+
+  return object;
 }
 
 void render()
 {
   //Clear color buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
-  //Bind program
+
+  // Bind shader program
   glUseProgram(gProgramID);
 
-  // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-  glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 24000.0f);
+  // Projection matrix (Field of View, Aspect Ratio, NearPlane, FarPlane)
+  glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 5000.0f);
 
   // Camera matrix
-  glm::mat4 View = glm::lookAt(
-    glm::vec3(50, 40, -40), // Camera is at (4,3,-3), in World Space
-    glm::vec3(0, 0, 0), // and looks at the origin
-    glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
-    );
+  glm::mat4 View = getCamera();
 
-  // Model matrix : an identity matrix (model will be at the origin)
+  // Model Matrix
   glm::mat4 Model = glm::mat4(1.0f);
   Model = glm::translate(Model, glm::vec3(0.0, -20.0, 0.0));
 
   static float rot = 0.0;
-  rot = rot + 0.0001;
-  Model = glm::rotate(Model, rot, glm::vec3(0.0, 1.0, 0.0));
+  rot = rot - 0.00333;
+
+  // Model View Projection Matrix
+  glm::mat4 MVP = Projection * View * Model; // I should handle this properly for each render object!!
   
-
-  // Our ModelViewProjection : multiplication of our 3 matrices
-  glm::mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
-
-  // Send our transformation to the currently bound shader, 
-  // in the "MVP" uniform
-  glUniformMatrix4fv(gLocMVP, 1, GL_FALSE, &MVP[0][0]);
-
-  // 1rst attribute buffer : verts
+  //Bind Vert Shader Attributes
   glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, gVBO);
-  glVertexAttribPointer(
-    0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-    3,                  // size
-    GL_FLOAT,           // type
-    GL_FALSE,           // normalized?
-    0,                  // stride
-    (void*)0            // array buffer offset
-    );
-
-  // 2nd attribute buffer : colors
   glEnableVertexAttribArray(1);
-  glBindBuffer(GL_ARRAY_BUFFER, gCBO);
-  glVertexAttribPointer(
-    1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-    3,                                // size
-    GL_FLOAT,                         // type
-    GL_FALSE,                         // normalized?
-    0,                                // stride
-    (void*)0                          // array buffer offset
-    );
 
-  // Draw the triangle !
-  glDrawArrays(GL_TRIANGLES, 0, saria.faceCount * 3); // 12*3 indices starting at 0 -> 12 triangles
+  glUniformMatrix4fv(gLocMVP, 1, GL_FALSE, &MVP[0][0]);
+  RenderRenderObject(kakrikoRenderObject);
 
+  Model = glm::translate(Model, glm::vec3(1130.0, 1000.0, 530.0));
+  Model = glm::rotate(Model, rot, glm::vec3(1.0, 0.0, 0.0));
+  MVP = Projection * View * Model;
+  glUniformMatrix4fv(gLocMVP, 1, GL_FALSE, &MVP[0][0]);
+  RenderRenderObject(windMillRenderObject);
+
+  //Unbind Vert Shader Attributes
   glDisableVertexAttribArray(0);
   glDisableVertexAttribArray(1);
 
@@ -526,14 +497,30 @@ void printShaderLog(GLuint shader)
 
 int wmain(int argc, char* argv[])
 {
-  //Start up SDL and create window
+  //Start SDL & Create Window
   if (!init())
   {
     printf("Failed to initialize!\n");
     getchar();
     return 1;
   }
-  
+
+  kakrikoMTL = LoadMTL("..\\..\\..\\game\\Assets\\Kakriko\\Kakriko.mtl");
+  InitializeMaterialLibrary(kakrikoMTL, "..\\..\\..\\game\\Assets\\Kakriko\\");
+  kakrikoOBJ = LoadOBJ("..\\..\\..\\game\\Assets\\Kakriko\\Kakriko.obj", kakrikoMTL);
+  kakrikoRenderObject = GenerateRenderObject(kakrikoOBJ, kakrikoMTL);
+
+  windMillMTL = LoadMTL("..\\..\\..\\game\\Assets\\Kakriko\\WindMill.mtl");
+  InitializeMaterialLibrary(windMillMTL, "..\\..\\..\\game\\Assets\\Kakriko\\");
+  windMillOBJ = LoadOBJ("..\\..\\..\\game\\Assets\\Kakriko\\WindMill.obj", windMillMTL);
+  windMillRenderObject = GenerateRenderObject(windMillOBJ, windMillMTL);
+
+  //Take control of the cursor
+  SDL_SetRelativeMouseMode(SDL_TRUE);
+
+  //Go Full screen?
+  if ( FULL_SCEEN ) SDL_SetWindowFullscreen(gWindow, SDL_WINDOW_FULLSCREEN);
+
   //Main loop flag
   bool running = true;
 
@@ -541,27 +528,32 @@ int wmain(int argc, char* argv[])
   SDL_Event e;
 
   //Enable text input
-  SDL_StartTextInput();
+  //SDL_StartTextInput();
 
-  initTextures();
-
-  //While application is running
   while (running)
   {
-
-    //Handle events in queue
+    //Handle SDL queue
     while (SDL_PollEvent(&e) != 0)
     {
-      //User requests quit
-      if (e.type == SDL_QUIT)
-      {
+      if (e.type == SDL_QUIT) // User closed window?
         running = false;
-      }
-      //Handle keys pressed with current mouse position
+      if (e.type == SDL_KEYDOWN) // User pressed esc?
+        if (e.key.keysym.sym == SDLK_ESCAPE)
+          running = false;
+
+      // mouse was moved
       int x = 0, y = 0;
-      SDL_GetMouseState(&x, &y);
-      handleKeys(e.text.text[0], x, y);
+      if (e.type == SDL_MOUSEMOTION)
+      {
+        x = e.motion.xrel;
+        y = e.motion.yrel;
+        MouseControls(x, y);
+      }
     }
+
+    //Handle keyboard input
+    const static unsigned char *keyboard = SDL_GetKeyboardState(NULL);
+    KeyboardControls(keyboard);
 
     //Render
     render();
@@ -569,13 +561,13 @@ int wmain(int argc, char* argv[])
     //Update screen
     SDL_GL_SwapWindow(gWindow);
 
+    //Just in case Vsync fails!
+    Sleep(15);
+
   }
 
-  //Disable text input
-  SDL_StopTextInput();
-
-  //Free resources
+  //Free engine resources
   close();
 
-  return 0;
+  return 0; // return success!
 }

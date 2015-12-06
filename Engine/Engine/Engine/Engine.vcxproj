@@ -176,7 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap Loader.h" />
-    <ClInclude Include="Math.h" />
+    <ClInclude Include="Controls.h" />
     <ClInclude Include="OBJ Loader.h" />
     <ClInclude Include="Shader Loader.h" />
     <ClInclude Include="Simple.h" />

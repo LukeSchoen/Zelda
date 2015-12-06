@@ -30,7 +30,7 @@
     <ClInclude Include="OBJ Loader.h">
       <Filter>Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Math.h">
+    <ClInclude Include="Controls.h">
       <Filter>Tools</Filter>
     </ClInclude>
   </ItemGroup>

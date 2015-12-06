@@ -1,0 +1,9 @@
+﻿Build started 9/09/2015 12:59:50 AM.
+     1>Project "D:\Workspace\3rdParty\SDL2-2.0.3\VisualC\SDLmain\SDLmain_VS2013.vcxproj" on node 3 (Build target(s)).
+     1>Lib:
+         SDLmain_VS2013.vcxproj -> D:\Workspace\3rdParty\SDL2-2.0.3\VisualC\SDLmain\x64\Debug\SDL2main.lib
+     1>Done Building Project "D:\Workspace\3rdParty\SDL2-2.0.3\VisualC\SDLmain\SDLmain_VS2013.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.21
