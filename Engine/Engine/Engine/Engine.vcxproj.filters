@@ -33,5 +33,8 @@
     <ClInclude Include="Controls.h">
       <Filter>Tools</Filter>
     </ClInclude>
+    <ClInclude Include="Render Object.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

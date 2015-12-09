@@ -178,6 +178,7 @@
     <ClInclude Include="Bitmap Loader.h" />
     <ClInclude Include="Controls.h" />
     <ClInclude Include="OBJ Loader.h" />
+    <ClInclude Include="Render Object.h" />
     <ClInclude Include="Shader Loader.h" />
     <ClInclude Include="Simple.h" />
   </ItemGroup>

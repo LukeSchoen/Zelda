@@ -57,6 +57,141 @@ int MaterialNameToTexture(char* materialName, MTL &mtl)
   }
 }
 
+char* ExtractMTLName(char* OBJpath)
+{
+  //Read File Into Memory
+  FILE *file = fopen(OBJpath, "rb");
+  fseek(file, 0, SEEK_END);
+  int fileSize = ftell(file);
+  fseek(file, 0, SEEK_SET);
+  char* fileData = new char[fileSize];
+  fread(fileData, 1, fileSize, file);
+  fclose(file);
+
+  //Do A Quick Parse Over The File To Determine How Much Temporary Memory We Need To Load It
+  bool newLine = true;
+  for (int fptr = 0; fptr < fileSize; fptr++)
+  {
+    if (newLine)
+    {
+      if (fileData[fptr] == 'm' & fileData[fptr + 1] == 't' & fileData[fptr + 2] == 'l' & fileData[fptr + 3] == 'l' & fileData[fptr + 4] == 'i' & fileData[fptr + 5] == 'b' & fileData[fptr + 6] == ' ')
+      {
+        char* mtlName = new char[256];
+        sscanf((const char*)(fileData + fptr + 7), "%s\n", mtlName);
+        delete[] fileData;
+        return mtlName;
+      }
+      newLine = false;
+    }
+    if (fileData[fptr] == '\n') // Count Lines
+    {
+      newLine = true;
+    }
+  }
+  printf("No material found in file %s \n\n", OBJpath);
+  delete[] fileData;
+  return nullptr;
+}
+
+MTL LoadMTL(char* path)
+{
+
+  //Variables
+  uint32_t fileSize = 0;
+  uint32_t materialCount = 0;
+  char materialName[256];
+  char materialPath[256];
+
+  //Read File Into Memory
+  FILE *file = fopen(path, "rb");
+  fseek(file, 0, SEEK_END);
+  fileSize = ftell(file);
+  fseek(file, 0, SEEK_SET);
+  char* fileData = new char[fileSize];
+  fread(fileData, 1, fileSize, file);
+  fclose(file);
+
+  //Do A Quick Parse Over The File To Determine How Much Temporary Memory We Need To Load It
+  bool newLine = true;
+  int lineType = 0;
+  for (int fptr = 0; fptr < fileSize; fptr++)
+  {
+    if (newLine) //Determine This Lines type
+    {
+      if (fileData[fptr] == '#' & fileData[fptr + 1] == ' ')
+        lineType = 1; // Comment
+
+      if (fileData[fptr] == 'n' & fileData[fptr + 1] == 'e' & fileData[fptr + 2] == 'w' & fileData[fptr + 3] == 'm' & fileData[fptr + 4] == 't' & fileData[fptr + 5] == 'l' & fileData[fptr + 6] == ' ')
+      {
+        lineType = 2; // New Material
+        materialCount++;
+      }
+
+      if (fileData[fptr] == 'm' & fileData[fptr + 1] == 'a' & fileData[fptr + 2] == 'p' & fileData[fptr + 3] == '_' & fileData[fptr + 4] == 'K' & fileData[fptr + 5] == 'd' & fileData[fptr + 6] == ' ')
+      {
+        lineType = 3; // Diffusive Map
+      }
+
+      if (lineType != 0)
+        newLine = false;
+    }
+    if (fileData[fptr] == '\n')
+    {
+      newLine = true;
+      lineType = 0;
+    }
+  }
+
+  //Create MTL
+  MTL MTL;
+  MTL.materials = new Material[materialCount];
+
+  //Parse File And Load Data
+  newLine = true;
+  uint32_t materialItr = 0;
+  for (int fptr = 0; fptr < fileSize; fptr++)
+  {
+    if (newLine) //Determine This Lines type
+    {
+      if (fileData[fptr] == '#' & fileData[fptr + 1] == ' ')
+        lineType = 1; // Comment
+
+      if (fileData[fptr] == 'n' & fileData[fptr + 1] == 'e' & fileData[fptr + 2] == 'w' & fileData[fptr + 3] == 'm' & fileData[fptr + 4] == 't' & fileData[fptr + 5] == 'l' & fileData[fptr + 6] == ' ')
+      {
+        lineType = 2; // New Material
+        sscanf((const char*)(fileData + fptr + 7), "%s\n", materialName);
+      }
+
+      if (fileData[fptr] == 'm' & fileData[fptr + 1] == 'a' & fileData[fptr + 2] == 'p' & fileData[fptr + 3] == '_' & fileData[fptr + 4] == 'K' & fileData[fptr + 5] == 'd' & fileData[fptr + 6] == ' ')
+      {
+        lineType = 3; // Diffusive Map
+        //Write Name
+        sscanf((const char*)(fileData + fptr + 7), "%s\n", materialPath);
+        MTL.materials[materialItr].name = new char[strlen(materialName) + 1];
+        memcpy(MTL.materials[materialItr].name, materialName, strlen(materialName));
+        MTL.materials[materialItr].name[strlen(materialName)] = NULL;
+
+        //Write Path
+        MTL.materials[materialItr].path = new char[strlen(materialPath) + 1];
+        memcpy(MTL.materials[materialItr].path, materialPath, strlen(materialPath));
+        MTL.materials[materialItr].path[strlen(materialPath)] = NULL;
+        materialItr++;
+        MTL.materialCount++;
+      }
+
+      if (lineType != 0)
+        newLine = false;
+    }
+    if (fileData[fptr] == '\n')
+    {
+      newLine = true;
+      lineType = 0;
+    }
+  }
+
+  return MTL;
+}
+
 OBJ LoadOBJ(char* path, MTL &mtl)
 {
   //Variables
@@ -205,103 +340,4 @@ OBJ LoadOBJ(char* path, MTL &mtl)
   delete[] OBJ_Verts;
   delete[] fileData;
   return model;
-}
-
-MTL LoadMTL(char* path)
-{
-
-  //Variables
-  uint32_t fileSize = 0;
-  uint32_t materialCount = 0;
-  char materialName[256];
-  char materialPath[256];
-
-  //Read File Into Memory
-  FILE *file = fopen(path, "rb");
-  fseek(file, 0, SEEK_END);
-  fileSize = ftell(file);
-  fseek(file, 0, SEEK_SET);
-  char* fileData = new char[fileSize];
-  fread(fileData, 1, fileSize, file);
-  fclose(file);
-
-  //Do A Quick Parse Over The File To Determine How Much Temporary Memory We Need To Load It
-  bool newLine = true;
-  int lineType = 0;
-  for (int fptr = 0; fptr < fileSize; fptr++)
-  {
-    if (newLine) //Determine This Lines type
-    {
-      if (fileData[fptr] == '#' & fileData[fptr + 1] == ' ')
-        lineType = 1; // Comment
-
-      if (fileData[fptr] == 'n' & fileData[fptr + 1] == 'e' & fileData[fptr + 2] == 'w' & fileData[fptr + 3] == 'm' & fileData[fptr + 4] == 't' & fileData[fptr + 5] == 'l' & fileData[fptr + 6] == ' ')
-      {
-        lineType = 2; // New Material
-        materialCount++;
-      }
-
-      if (fileData[fptr] == 'm' & fileData[fptr + 1] == 'a' & fileData[fptr + 2] == 'p' & fileData[fptr + 3] == '_' & fileData[fptr + 4] == 'K' & fileData[fptr + 5] == 'd' & fileData[fptr + 6] == ' ')
-      {
-        lineType = 3; // Diffusive Map
-      }
-
-      if (lineType != 0)
-        newLine = false;
-    }
-    if (fileData[fptr] == '\n')
-    {
-      newLine = true;
-      lineType = 0;
-    }
-  }
-
-  //Create MTL
-  MTL MTL;
-  MTL.materials = new Material[materialCount];
-
-  //Parse File And Load Data
-  newLine = true;
-  uint32_t materialItr = 0;
-  for (int fptr = 0; fptr < fileSize; fptr++)
-  {
-    if (newLine) //Determine This Lines type
-    {
-      if (fileData[fptr] == '#' & fileData[fptr + 1] == ' ')
-        lineType = 1; // Comment
-
-      if (fileData[fptr] == 'n' & fileData[fptr + 1] == 'e' & fileData[fptr + 2] == 'w' & fileData[fptr + 3] == 'm' & fileData[fptr + 4] == 't' & fileData[fptr + 5] == 'l' & fileData[fptr + 6] == ' ')
-      {
-        lineType = 2; // New Material
-        sscanf((const char*)(fileData + fptr + 7), "%s\n", materialName);
-      }
-
-      if (fileData[fptr] == 'm' & fileData[fptr + 1] == 'a' & fileData[fptr + 2] == 'p' & fileData[fptr + 3] == '_' & fileData[fptr + 4] == 'K' & fileData[fptr + 5] == 'd' & fileData[fptr + 6] == ' ')
-      {
-        lineType = 3; // Diffusive Map
-        //Write Name
-        sscanf((const char*)(fileData + fptr + 7), "%s\n", materialPath);
-        MTL.materials[materialItr].name = new char[strlen(materialName) + 1];
-        memcpy(MTL.materials[materialItr].name, materialName, strlen(materialName));
-        MTL.materials[materialItr].name[strlen(materialName)] = NULL;
-
-        //Write Path
-        MTL.materials[materialItr].path = new char[strlen(materialPath) + 1];
-        memcpy(MTL.materials[materialItr].path, materialPath, strlen(materialPath));
-        MTL.materials[materialItr].path[strlen(materialPath)] = NULL;
-        materialItr++;
-        MTL.materialCount++;
-      }
-
-      if (lineType != 0)
-        newLine = false;
-    }
-    if (fileData[fptr] == '\n')
-    {
-      newLine = true;
-      lineType = 0;
-    }
-  }
-
-  return MTL;
 }
