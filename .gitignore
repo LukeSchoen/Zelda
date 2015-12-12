@@ -1,3 +1,7 @@
 *.sdf
 *.opensdf
 *.suo
+/Game/Zelda/Win32/Debug/Platform.pdb
+/Game/Zelda/Win32/Debug/*.exe
+/Game/Zelda/Win32/Debug
+/Platform/Platform/Win32/Debug

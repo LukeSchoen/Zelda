@@ -1,5 +1,9 @@
+#ifndef OBJ Loader_h__
+#define OBJ Loader_h__
+
 #include <stdio.h>
 #include <cstdint>
+#include <string.h>
 #include "detail\func_common.hpp"
 
 //////////////////////////////////////////////////////////////////////////
@@ -55,6 +59,7 @@ int MaterialNameToTexture(char* materialName, MTL &mtl)
       return mtl.materials[matID].textureID;
     }
   }
+  return 0;
 }
 
 char* ExtractMTLName(char* OBJpath)
@@ -341,3 +346,4 @@ OBJ LoadOBJ(char* path, MTL &mtl)
   delete[] fileData;
   return model;
 }
+#endif // OBJ Loader_h__

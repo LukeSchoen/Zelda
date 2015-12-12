@@ -19,12 +19,12 @@
 #include <gl\glu.h>
 #include "SDL_opengles2.h"
 
+#include "Physics.h"
 #include "Bitmap Loader.h"
 #include "OBJ Loader.h"
 #include "Render Object.h"
 #include "Shader Loader.h"
 #include "Controls.h"
-
 
 #pragma endregion
 
@@ -35,7 +35,7 @@ const char* PROGRAM_NAME = "ZELDA";
 //Window resolution
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
-const bool FULL_SCEEN = false;
+const bool FULL_SCEEN = true;
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -52,9 +52,12 @@ GLint gLocVertexPos4D = -1;
 GLuint gLocTexture = -1;
 
 //Model References
+RenderObject SkyRenderObject;
 RenderObject kakrikoRenderObject;
-
 RenderObject windMillRenderObject;
+
+//Collision References
+OBJ kakrikoCollisionOBJ;
 
 #pragma endregion
 
@@ -240,7 +243,7 @@ void render()
   glUseProgram(gProgramID);
 
   // Projection matrix (Field of View, Aspect Ratio, NearPlane, FarPlane)
-  glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 5000.0f);
+  glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 3.f, 30000.0f);
 
   // Camera matrix
   glm::mat4 View = getCamera();
@@ -259,14 +262,26 @@ void render()
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
 
+  //town
   glUniformMatrix4fv(gLocMVP, 1, GL_FALSE, &MVP[0][0]);
   RenderRenderObject(kakrikoRenderObject);
 
+  //windmill
+  Model = glm::mat4(1.0f);
   Model = glm::translate(Model, glm::vec3(1130.0, 1000.0, 530.0));
   Model = glm::rotate(Model, rot, glm::vec3(1.0, 0.0, 0.0));
   MVP = Projection * View * Model;
   glUniformMatrix4fv(gLocMVP, 1, GL_FALSE, &MVP[0][0]);
   RenderRenderObject(windMillRenderObject);
+
+  //sky
+  Model = glm::mat4(1.0f);
+  Model = glm::translate(Model, glm::vec3(1130.0, 1000.0, 530.0));
+  Model = glm::rotate(Model, rot * -0.05f, glm::vec3(0.0, 1.0, 0.0));
+  MVP = Projection * View * Model;
+  glUniformMatrix4fv(gLocMVP, 1, GL_FALSE, &MVP[0][0]);
+  RenderRenderObject(SkyRenderObject);
+
 
   //Unbind Vert Shader Attributes
   glDisableVertexAttribArray(0);
@@ -364,6 +379,12 @@ int wmain(int argc, char* argv[])
     return 1;
   }
 
+  MTL nothing;
+  kakrikoCollisionOBJ = LoadOBJ("../../../game/Assets/Kakriko/Kakriko.obj", nothing);
+
+
+  
+  SkyRenderObject = GenerateRenderObject("../../../game/Assets/sky/Day.obj");
   kakrikoRenderObject = GenerateRenderObject("../../../game/Assets/Kakriko/Kakriko.obj");
   windMillRenderObject = GenerateRenderObject("../../../game/Assets/Kakriko/WindMill.obj");
 
@@ -405,7 +426,57 @@ int wmain(int argc, char* argv[])
 
     //Handle keyboard input
     const static unsigned char *keyboard = SDL_GetKeyboardState(NULL);
-    KeyboardControls(keyboard);
+    glm::vec3 camOff;
+
+    static bool flyMode = false;
+    static bool flyHeld = false;
+    static bool jumpHeld = false;
+
+    static float vMomentum = 0.0;
+
+    if (keyboard[SDL_SCANCODE_F])
+    {
+      if (flyHeld == false)
+        flyMode = !flyMode;
+      flyHeld = true;
+    }
+    else
+    {
+      flyHeld = false;
+    }
+
+    glm::vec3 camSphere = glm::vec3(8.0, 32, 8.0);
+
+    // offset cam to head
+    camPos += glm::vec3(0.0, 16, 0.0);
+
+    if (flyMode)
+    {//3d movement
+      camOff = CameraKeyboardControls(keyboard);
+      camPos += camOff;
+    }
+    else
+    {
+      float camHeight = camPos.y;
+      camOff = CameraKeyboardControls2D(keyboard);
+      camPos = 0.0f - PhysicsMove(0.0f - camPos, 0.0f - camOff, camSphere, kakrikoCollisionOBJ);
+      if (PhysicsCollision(0.0f - camPos, glm::vec3(0.0, vMomentum, 0.0), camSphere, kakrikoCollisionOBJ))
+      {//On ground
+        if (vMomentum < 0)
+          vMomentum = - 5;
+        if (keyboard[SDL_SCANCODE_SPACE])
+        {
+          vMomentum = 10;
+        }
+      }
+      //else
+      vMomentum = vMomentum - 0.4;
+      {//falling
+        camPos = 0.0f - PhysicsMove(0.0f - camPos, glm::vec3(0.0, vMomentum, 0.0), camSphere, kakrikoCollisionOBJ);
+      }
+    }
+
+    camPos -= glm::vec3(0.0, 16, 0.0);
 
     //Render
     render();
