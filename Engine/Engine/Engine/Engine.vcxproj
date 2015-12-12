@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5BF8A5BF-BFF6-47A7-8B62-42DE505E2BFB}</ProjectGuid>
+    <ProjectGuid>{039F3F05-04AA-450E-B3A8-BF101E7C36F3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SDL_GLSL</RootNamespace>
     <ProjectName>Engine</ProjectName>
@@ -90,7 +90,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\3rdParty\SDL2-2.0.3\include;$(SolutionDir)..\3rdParty\glew-1.13.0\include;$(SolutionDir)..\3rdParty\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\include;$(ProjectDir)..\..\3rdParty\glew-1.13.0\include;$(ProjectDir)..\..\3rdParty\glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -108,7 +108,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\3rdParty\SDL2-2.0.3\include;$(SolutionDir)..\3rdParty\glew-1.13.0\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\include;$(ProjectDir)..\..\3rdParty\glew-1.13.0\include;$(ProjectDir)..\..\3rdParty\glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,7 +128,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\3rdParty\SDL2-2.0.3\include;$(SolutionDir)..\3rdParty\glew-1.13.0\include;$(SolutionDir)..\3rdParty\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\include;$(ProjectDir)..\..\3rdParty\glew-1.13.0\include;$(ProjectDir)..\..\3rdParty\glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,7 +150,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\3rdParty\SDL2-2.0.3\include;$(SolutionDir)..\3rdParty\glew-1.13.0\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\include;$(ProjectDir)..\..\3rdParty\glew-1.13.0\include;$(ProjectDir)..\..\3rdParty\glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,7 +164,10 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Engine.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)..\3rdParty\SDL2-2.0.3\include;$(SolutionDir)..\3rdParty\glew-1.13.0\include;$(SolutionDir)..\3rdParty\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)..\3rdParty\SDL2-2.0.3\include;$(SolutionDir)..\3rdParty\glew-1.13.0\include;$(SolutionDir)..\3rdParty\glm</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\3rdParty\glew-1.13.0\build\vc12\glew_static.vcxproj">
