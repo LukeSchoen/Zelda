@@ -2,10 +2,10 @@
 
 layout(location = 0) in vec3 vert;
 layout(location = 1) in vec2 vertexUV;
-layout(location = 1) in int tex;
+layout(location = 2) in vec3 vertexNorm;
 
 out vec2 UV;
-out int TI;
+out vec3 NORM;
 
 uniform mat4 MVP;
 
@@ -13,5 +13,6 @@ void main()
 {
 	gl_Position =  MVP * vec4(vert,1);
 	UV = vertexUV;
+	NORM = vertexNorm;
 }
 

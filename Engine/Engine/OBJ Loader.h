@@ -142,6 +142,7 @@ MTL LoadMTL(char* path)
     }
     if (fileData[fptr] == '\n')
     {
+      fileData[fptr] = NULL;
       newLine = true;
       lineType = 0;
     }
@@ -164,14 +165,14 @@ MTL LoadMTL(char* path)
       if (fileData[fptr] == 'n' & fileData[fptr + 1] == 'e' & fileData[fptr + 2] == 'w' & fileData[fptr + 3] == 'm' & fileData[fptr + 4] == 't' & fileData[fptr + 5] == 'l' & fileData[fptr + 6] == ' ')
       {
         lineType = 2; // New Material
-        sscanf((const char*)(fileData + fptr + 7), "%s\n", materialName);
+        sscanf((const char*)(fileData + fptr + 7), "%s", materialName);
       }
 
       if (fileData[fptr] == 'm' & fileData[fptr + 1] == 'a' & fileData[fptr + 2] == 'p' & fileData[fptr + 3] == '_' & fileData[fptr + 4] == 'K' & fileData[fptr + 5] == 'd' & fileData[fptr + 6] == ' ')
       {
         lineType = 3; // Diffusive Map
         //Write Name
-        sscanf((const char*)(fileData + fptr + 7), "%s\n", materialPath);
+        sscanf((const char*)(fileData + fptr + 7), "%s", materialPath);
         MTL.materials[materialItr].name = new char[strlen(materialName) + 1];
         memcpy(MTL.materials[materialItr].name, materialName, strlen(materialName));
         MTL.materials[materialItr].name[strlen(materialName)] = NULL;
@@ -187,7 +188,7 @@ MTL LoadMTL(char* path)
       if (lineType != 0)
         newLine = false;
     }
-    if (fileData[fptr] == '\n')
+    if (fileData[fptr] == NULL)
     {
       newLine = true;
       lineType = 0;
@@ -251,6 +252,7 @@ OBJ LoadOBJ(char* path, MTL &mtl)
     }
     if (fileData[fptr] == '\n') // Count Lines
     {
+      fileData[fptr] = NULL; // replace new lines with null, this fixed sscanf which always reads untill a null
       newLine = true;
       lineType = 0;
       lineCount++;
@@ -299,7 +301,7 @@ OBJ LoadOBJ(char* path, MTL &mtl)
         char d1[32];
         char d2[32];
         char d3[32];
-        sscanf((const char*)(fileData + fptr + 2), "%s %s %s\n", d1, d2, d3);
+        sscanf((const char*)(fileData + fptr + 2), "%s %s %s", d1, d2, d3);
         int v1 = 0;
         int v2 = 0;
         int v3 = 0;
@@ -328,7 +330,7 @@ OBJ LoadOBJ(char* path, MTL &mtl)
       if (fileData[fptr] == 'u' & fileData[fptr + 1] == 's' & fileData[fptr + 2] == 'e' & fileData[fptr + 3] == 'm' & fileData[fptr + 4] == 't' & fileData[fptr + 5] == 'l' & fileData[fptr + 6] == ' ')
       {
         lineType = 6; // Using Material
-        sscanf((const char*)(fileData + fptr + 7), "%s\n", materialName);
+        sscanf((const char*)(fileData + fptr + 7), "%s", materialName);
         actvTex = MaterialNameToTexture(materialName, mtl);
         lineType = lineType;
       }
@@ -336,12 +338,13 @@ OBJ LoadOBJ(char* path, MTL &mtl)
       if (lineType != 0)
         newLine = false;
     }
-    if (fileData[fptr] == '\n') // End of line
+    if (fileData[fptr] == NULL) // End of line
     {
       newLine = true;
       lineType = 0;
     }
   }
+
   delete[] OBJ_Verts;
   delete[] fileData;
   return model;

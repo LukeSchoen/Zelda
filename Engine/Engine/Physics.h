@@ -10,6 +10,7 @@
 struct Collision
 {
   glm::vec3 position;
+  glm::vec3 worldPosition;
   glm::vec3 velocity;
   glm::vec3 Elipsoid;
   glm::vec3 lastSafePosition;
@@ -130,7 +131,7 @@ namespace // internal physics
 
   // Mesh Collision
 
-  void PerformCollisionCheck(Collision &colPackage, OBJ &mesh)
+  void PerformCollisionCheck(Collision &collision, OBJ &mesh)
   {
     // plane data
     glm::vec3 ver1, vert2, vert3;
@@ -142,9 +143,10 @@ namespace // internal physics
     glm::vec3 planeIntersectionPoint;
     glm::vec3 polyIntersectionPoint;
 
-    glm::vec3 position = colPackage.position;
-    glm::vec3 elipsoidRadius = colPackage.Elipsoid;
-    glm::vec3 velocity = colPackage.velocity;
+    glm::vec3 position = collision.position;
+    glm::vec3 worldPosition = collision.worldPosition;
+    glm::vec3 elipsoidRadius = collision.Elipsoid;
+    glm::vec3 velocity = collision.velocity;
 
     glm::vec3 normalizedVelocity = glm::normalize(velocity);
     double distanceToTravel = glm::length(velocity);
@@ -152,9 +154,20 @@ namespace // internal physics
     double distToPlaneIntersection;
     double distToEllipsoidIntersection;
 
+    uint32_t checked = 0;
+
     // loop through all polys
     for (int polyItr = 0; polyItr < mesh.faceCount; polyItr++)
     {
+      //Are we even anywhere near this poly? very broken/simple optimization
+      glm::vec3 polyDist = worldPosition - glm::vec3(mesh.polys[polyItr].verticies[0].x, mesh.polys[polyItr].verticies[0].y, mesh.polys[polyItr].verticies[0].z);
+      if (glm::dot(polyDist, polyDist) > 10000000)
+      {
+        continue;
+      }
+
+      checked++;
+
       // Project triangle into ellipsoid space
       ver1.x = mesh.polys[polyItr].verticies[0].x / elipsoidRadius.x;
       ver1.y = mesh.polys[polyItr].verticies[0].y / elipsoidRadius.y;
@@ -190,38 +203,41 @@ namespace // internal physics
         planeIntersectionPoint.y = sphereIntersectionPoint.y + distToPlaneIntersection * normalizedVelocity.y;
         planeIntersectionPoint.z = sphereIntersectionPoint.z + distToPlaneIntersection * normalizedVelocity.z;
       }
-      //These may be correct ( if the intersection point is within the original poly)
+
+      // This point MAY be correct ( if the intersection point is within the original poly)
       polyIntersectionPoint = planeIntersectionPoint;
       distToEllipsoidIntersection = distToPlaneIntersection;
 
+      // if not do the full calculation
       if (!IsPointInTriangle(planeIntersectionPoint, ver1, vert2, vert3))
       {
         polyIntersectionPoint = ProjectPointOntoTriangle(ver1, vert2, vert3, planeIntersectionPoint);
         distToEllipsoidIntersection = ProjectRayOntoSphere(polyIntersectionPoint, -normalizedVelocity, position, 1.0f);
         if (distToEllipsoidIntersection > 0)
-        {// calculate true sphere intersection point
+        {// calculate the true sphere intersection point
           sphereIntersectionPoint.x = polyIntersectionPoint.x + distToEllipsoidIntersection * -normalizedVelocity.x;
           sphereIntersectionPoint.y = polyIntersectionPoint.y + distToEllipsoidIntersection * -normalizedVelocity.y;
           sphereIntersectionPoint.z = polyIntersectionPoint.z + distToEllipsoidIntersection * -normalizedVelocity.z;
         }
       }
 
-      // are we jammed in the poly?
+      // are we all jammed up in the poly?
       if (IsPointInSphere(polyIntersectionPoint, position, 1.0f))
-        colPackage.isStuck = true;
+        collision.isStuck = true;
 
-      // Calculate collision data
+      // store collision information
       if ((distToEllipsoidIntersection > 0) && (distToEllipsoidIntersection <= distanceToTravel))
       {
-        if ((colPackage.collisionFound == false) || (distToEllipsoidIntersection < colPackage.collisionTvalue))
+        if ((collision.collisionFound == false) || (distToEllipsoidIntersection < collision.collisionTvalue))
         {
-          colPackage.collisionTvalue = distToEllipsoidIntersection;
-          colPackage.ellipsoidIntersectionPoint = sphereIntersectionPoint;
-          colPackage.PolygonIntersectionPoint = polyIntersectionPoint;
-          colPackage.collisionFound = true;
+          collision.collisionTvalue = distToEllipsoidIntersection;
+          collision.ellipsoidIntersectionPoint = sphereIntersectionPoint;
+          collision.PolygonIntersectionPoint = polyIntersectionPoint;
+          collision.collisionFound = true;
         }
       }
-    }	
+    }
+    //printf("checked: %d\n\n", checked);
   }
 
 
@@ -245,13 +261,13 @@ namespace // internal physics
     PerformCollisionCheck(WorldCollision, mesh);
 
     if (WorldCollision.collisionFound == false)
-    { // no collision? great move to target
+    {
       position = position + glm::normalize(velocity) * (glm::length(velocity) - MovementEpsilon);
       WorldCollision.lastSafePosition = position;
       return position;
     }
     else
-    {// ow dear, here we go..
+    {
       if (WorldCollision.isStuck) // did we get stuck?
         return WorldCollision.lastSafePosition;
       // Slide along this polygon by moving to the surface and making velocity perpendicular
@@ -290,14 +306,14 @@ namespace // internal physics
 bool PhysicsCollision(glm::vec3 position, glm::vec3 velocity, glm::vec3 ellipsoidRadius, OBJ &mesh)
 {
   // project position and velocity into ellipsoid space
-  position /= ellipsoidRadius;
   velocity /= ellipsoidRadius;
 
   if (glm::length(velocity) < MovementEpsilon)
     return false;
 
   WorldCollision.velocity = velocity;
-  WorldCollision.position = position;
+  WorldCollision.position = position / ellipsoidRadius;
+  WorldCollision.worldPosition = position;
   WorldCollision.Elipsoid = ellipsoidRadius;
   WorldCollision.collisionFound = false;
   WorldCollision.isStuck = false;
@@ -312,6 +328,8 @@ glm::vec3 PhysicsMove(glm::vec3 position, glm::vec3 velocity, glm::vec3 ellipsoi
   // project position and velocity into ellipsoid space
   glm::vec3 scaledPosition = position / ellipsoidRadius;
   glm::vec3 scaledVelocity = velocity / ellipsoidRadius;
+
+  WorldCollision.worldPosition = position;
   WorldCollision.Elipsoid = ellipsoidRadius;
 
   glm::vec3 finalPosition = HandleCollisionResponse(scaledPosition, scaledVelocity, mesh);

@@ -5,12 +5,15 @@
 
 struct VertexObject
 {
+  uint32_t verticeCount = 0;
   GLint textureID = 0;
   GLuint vertPosDataGLPtr = 0;
   GLuint texPosDataGLPtr = 0;
-  uint32_t verticeCount = 0;
+  GLuint normPosDataGLPtr = 0;
   GLfloat *vertPosData;
   GLfloat *texPosData;
+  GLfloat *normPosData;
+
 };
 
 struct RenderObject
@@ -61,11 +64,22 @@ void RenderRenderObject(RenderObject &RenObj)
       (void*)0            // array buffer offset
       );
 
-    //texture positions
+    //texture coordinates
     glBindBuffer(GL_ARRAY_BUFFER, RenObj.vertexObjects[VertexObjectID].texPosDataGLPtr);
     glVertexAttribPointer(
       1,                  // attribute number. must match the layout in the shader.
       2,                  // count
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      (void*)0            // array buffer offset
+      );
+
+    //polygon normals
+    glBindBuffer(GL_ARRAY_BUFFER, RenObj.vertexObjects[VertexObjectID].normPosDataGLPtr);
+    glVertexAttribPointer(
+      2,                  // attribute number. must match the layout in the shader.
+      3,                  // count
       GL_FLOAT,           // type
       GL_FALSE,           // normalized?
       0,                  // stride
@@ -97,31 +111,56 @@ RenderObject GenerateRenderObject(OBJ &model, MTL &materials)
     object.vertexObjects[objID].textureID = texID;
     object.vertexObjects[objID].vertPosData = new GLfloat[faceCount * 9];
     object.vertexObjects[objID].texPosData = new GLfloat[faceCount * 6];
+    object.vertexObjects[objID].normPosData = new GLfloat[faceCount * 9];
+
     uint32_t currentFace = 0;
     for (int faceID = 0; faceID < model.faceCount; faceID++)
     {
       if (texID == model.polys[faceID].textureID)
       {
+        //Positions
         object.vertexObjects[objID].vertPosData[currentFace * 9 + 0] = model.polys[faceID].verticies[0].x;
         object.vertexObjects[objID].vertPosData[currentFace * 9 + 1] = model.polys[faceID].verticies[0].y;
         object.vertexObjects[objID].vertPosData[currentFace * 9 + 2] = model.polys[faceID].verticies[0].z;
-
-        object.vertexObjects[objID].texPosData[currentFace * 6 + 0] = model.polys[faceID].verticies[0].u;
-        object.vertexObjects[objID].texPosData[currentFace * 6 + 1] = model.polys[faceID].verticies[0].v;
 
         object.vertexObjects[objID].vertPosData[currentFace * 9 + 3] = model.polys[faceID].verticies[1].x;
         object.vertexObjects[objID].vertPosData[currentFace * 9 + 4] = model.polys[faceID].verticies[1].y;
         object.vertexObjects[objID].vertPosData[currentFace * 9 + 5] = model.polys[faceID].verticies[1].z;
 
-        object.vertexObjects[objID].texPosData[currentFace * 6 + 2] = model.polys[faceID].verticies[1].u;
-        object.vertexObjects[objID].texPosData[currentFace * 6 + 3] = model.polys[faceID].verticies[1].v;
-
         object.vertexObjects[objID].vertPosData[currentFace * 9 + 6] = model.polys[faceID].verticies[2].x;
         object.vertexObjects[objID].vertPosData[currentFace * 9 + 7] = model.polys[faceID].verticies[2].y;
         object.vertexObjects[objID].vertPosData[currentFace * 9 + 8] = model.polys[faceID].verticies[2].z;
 
+        //UVs
+        object.vertexObjects[objID].texPosData[currentFace * 6 + 0] = model.polys[faceID].verticies[0].u;
+        object.vertexObjects[objID].texPosData[currentFace * 6 + 1] = model.polys[faceID].verticies[0].v;
+
+        object.vertexObjects[objID].texPosData[currentFace * 6 + 2] = model.polys[faceID].verticies[1].u;
+        object.vertexObjects[objID].texPosData[currentFace * 6 + 3] = model.polys[faceID].verticies[1].v;
+
         object.vertexObjects[objID].texPosData[currentFace * 6 + 4] = model.polys[faceID].verticies[2].u;
         object.vertexObjects[objID].texPosData[currentFace * 6 + 5] = model.polys[faceID].verticies[2].v;
+
+        //Normals
+        glm::vec3 V1 = glm::vec3(model.polys[faceID].verticies[0].x, model.polys[faceID].verticies[0].y, model.polys[faceID].verticies[0].z);
+        glm::vec3 V2 = glm::vec3(model.polys[faceID].verticies[1].x, model.polys[faceID].verticies[1].y, model.polys[faceID].verticies[1].z);
+        glm::vec3 V3 = glm::vec3(model.polys[faceID].verticies[2].x, model.polys[faceID].verticies[2].y, model.polys[faceID].verticies[2].z);
+        glm::vec3 Vert1 = V2 - V1;
+        glm::vec3 Vert2 = V3 - V1;
+        glm::vec3 Normal = glm::normalize(glm::cross(Vert1, Vert2));
+
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 0] = Normal.x;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 1] = Normal.y;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 2] = Normal.z;
+
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 3] = Normal.x;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 4] = Normal.y;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 5] = Normal.z;
+
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 6] = Normal.x;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 7] = Normal.y;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 8] = Normal.z;
+
         object.vertexObjects[objID].verticeCount += 3;
         currentFace++;
       }
@@ -135,6 +174,10 @@ RenderObject GenerateRenderObject(OBJ &model, MTL &materials)
     glGenBuffers(1, &object.vertexObjects[objID].texPosDataGLPtr);
     glBindBuffer(GL_ARRAY_BUFFER, object.vertexObjects[objID].texPosDataGLPtr);
     glBufferData(GL_ARRAY_BUFFER, faceCount * 6 * sizeof(GLfloat), object.vertexObjects[objID].texPosData, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &object.vertexObjects[objID].normPosDataGLPtr);
+    glBindBuffer(GL_ARRAY_BUFFER, object.vertexObjects[objID].normPosDataGLPtr);
+    glBufferData(GL_ARRAY_BUFFER, faceCount * 9 * sizeof(GLfloat), object.vertexObjects[objID].normPosData, GL_STATIC_DRAW);
 
   }
   return object;

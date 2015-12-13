@@ -35,7 +35,7 @@ const char* PROGRAM_NAME = "ZELDA";
 //Window resolution
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
-const bool FULL_SCEEN = true;
+const bool FULL_SCEEN = false;
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -260,6 +260,7 @@ void render()
   //Bind Vert Shader Attributes
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
 
   //sky
   View = getCameraRotOnly();
@@ -291,6 +292,7 @@ void render()
   //Unbind Vert Shader Attributes
   glDisableVertexAttribArray(0);
   glDisableVertexAttribArray(1);
+  glDisableVertexAttribArray(2);
 
   //Unbind program
   glUseProgram(NULL);

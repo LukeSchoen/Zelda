@@ -11,6 +11,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL2", "..\3rdParty\SDL2-2.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew_static", "..\3rdParty\glew-1.13.0\build\vc12\glew_static.vcxproj", "{664E6F0D-6784-4760-9565-D54F8EB1EDF4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{70E4E4BE-A60A-4860-A76D-38FE2F0BA150}"
+	ProjectSection(SolutionItems) = preProject
+		Performance1.psess = Performance1.psess
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug MX|Win32 = Debug MX|Win32
@@ -78,5 +83,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{81CE8DAF-EBB2-4761-8E45-B71ABCCA8C68} = {7D335CD3-A3B2-480B-899C-CBF7D104DB35}
 		{664E6F0D-6784-4760-9565-D54F8EB1EDF4} = {7D335CD3-A3B2-480B-899C-CBF7D104DB35}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

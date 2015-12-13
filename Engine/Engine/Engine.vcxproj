@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{039F3F05-04AA-450E-B3A8-BF101E7C36F3}</ProjectGuid>
+    <ProjectGuid>{5BF8A5BF-BFF6-47A7-8B62-42DE505E2BFB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SDL_GLSL</RootNamespace>
     <ProjectName>Engine</ProjectName>
