@@ -5,3 +5,9 @@
 /Game/Zelda/Win32/Debug/*.exe
 /Game/Zelda/Win32/Debug
 /Platform/Platform/Win32/Debug
+/Engine/3rdParty/SDL2-2.0.3/VisualC/SDLmain/Win32/Debug
+/Engine/3rdParty/SDL2-2.0.3/VisualC/SDLmain/Win32/Debug/SDL2main.tlog
+/Engine/3rdParty/SDL2-2.0.3/VisualC/SDLtest/Win32/Debug
+/Engine/3rdParty/SDL2-2.0.3/VisualC/SDLtest/Win32/Debug/SDL2test.tlog
+/Engine/3rdParty/SDL2-2.0.3/VisualC/SDLmain/x64/Release/SDL2main.tlog
+/Engine/3rdParty/SDL2-2.0.3/VisualC/SDLmain/Win32/Debug/SDL2main.tlog/*.tlog
