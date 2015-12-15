@@ -243,7 +243,7 @@ void render()
   glUseProgram(gProgramID);
 
   // Projection matrix (Field of View, Aspect Ratio, NearPlane, FarPlane)
-  glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 3.f, 3000000.0f);
+  glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 3.f, 100000.0f);
 
   // Camera matrix
   glm::mat4 View;
