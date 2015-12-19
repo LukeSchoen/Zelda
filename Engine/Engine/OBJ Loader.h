@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string.h>
 #include "detail\func_common.hpp"
+#include <glm.hpp>
 
 //////////////////////////////////////////////////////////////////////////
 //  STRUCTS
@@ -15,8 +16,23 @@ struct Vertex
   float x;
   float y;
   float z;
+  float nx;
+  float ny;
+  float nz;
   float u;
   float v;
+};
+
+struct vectorMean
+{
+  vectorMean()
+  {
+    vec3[0] = 0.0f;
+    vec3[1] = 0.0f;
+    vec3[2] = 0.0f;
+  }
+  int count = 0;
+  float vec3[3];
 };
 
 struct Triangle
@@ -42,6 +58,7 @@ struct OBJ
 {
   uint32_t faceCount = 0;
   Triangle *polys;
+  vectorMean *normals;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -69,6 +86,7 @@ char* ExtractMTLName(char* OBJpath)
   fseek(file, 0, SEEK_END);
   int fileSize = ftell(file);
   fseek(file, 0, SEEK_SET);
+  assert(_heapchk() == _HEAPOK);
   char* fileData = new char[fileSize];
   fread(fileData, 1, fileSize, file);
   fclose(file);
@@ -263,6 +281,14 @@ OBJ LoadOBJ(char* path, MTL &mtl)
   OBJ model;
   Vertex *OBJ_Verts = new Vertex[max(vertCount, UVCount)];
   model.polys = new Triangle[faceCount];
+  model.normals = new vectorMean[vertCount];
+
+  for (int i = 0; i < vertCount; i++)
+  {
+    model.normals[i].vec3[0] = 0;
+    model.normals[i].vec3[1] = 0;
+    model.normals[i].vec3[2] = 0;
+  }
 
   //Parse File And Load Data
   int vertItr = 0;
@@ -271,6 +297,8 @@ OBJ LoadOBJ(char* path, MTL &mtl)
   int actvTex = 0;
   char materialName[256];
   newLine = true;
+
+
   for (int fptr = 0; fptr < fileSize; fptr++)
   {
     if (newLine) //Determine This Lines type
@@ -315,6 +343,52 @@ OBJ LoadOBJ(char* path, MTL &mtl)
         model.polys[faceItr].verticies[0] = OBJ_Verts[v1 - 1];
         model.polys[faceItr].verticies[1] = OBJ_Verts[v2 - 1];
         model.polys[faceItr].verticies[2] = OBJ_Verts[v3 - 1];
+
+        if (isnan(model.polys[faceItr].verticies[0].x))
+        {
+          printf("error");
+        }
+
+        glm::vec3 a;
+        glm::vec3 b;
+        glm::vec3 norm;
+
+        a.x = model.polys[faceItr].verticies[0].x;
+        a.y = model.polys[faceItr].verticies[0].y;
+        a.z = model.polys[faceItr].verticies[0].z;
+
+        b.x = model.polys[faceItr].verticies[1].x;
+        b.y = model.polys[faceItr].verticies[1].y;
+        b.z = model.polys[faceItr].verticies[1].z;
+
+        norm.x = model.polys[faceItr].verticies[2].x;
+        norm.y = model.polys[faceItr].verticies[2].y;
+        norm.z = model.polys[faceItr].verticies[2].z;
+
+        a = a - b;
+        b = norm - b;
+
+        norm = glm::cross(a, b);
+        norm = glm::normalize(norm);
+
+        if (!isnan(norm.x))
+        {
+          model.normals[v1 - 1].vec3[0] += norm.x;
+          model.normals[v1 - 1].vec3[1] += norm.y;
+          model.normals[v1 - 1].vec3[2] += norm.z;
+          model.normals[v2 - 1].vec3[0] += norm.x;
+          model.normals[v2 - 1].vec3[1] += norm.y;
+          model.normals[v2 - 1].vec3[2] += norm.z;
+          model.normals[v3 - 1].vec3[0] += norm.x;
+          model.normals[v3 - 1].vec3[1] += norm.y;
+          model.normals[v3 - 1].vec3[2] += norm.z;
+        }
+
+
+
+
+
+
         //Store Faces Vertex UV Data
         model.polys[faceItr].verticies[0].u = OBJ_Verts[t1 - 1].u;
         model.polys[faceItr].verticies[0].v = OBJ_Verts[t1 - 1].v;
@@ -333,6 +407,76 @@ OBJ LoadOBJ(char* path, MTL &mtl)
         sscanf((const char*)(fileData + fptr + 7), "%s", materialName);
         actvTex = MaterialNameToTexture(materialName, mtl);
         lineType = lineType;
+      }
+  
+      if (lineType != 0)
+        newLine = false;
+    }
+    if (fileData[fptr] == NULL) // End of line
+    {
+      newLine = true;
+      lineType = 0;
+    }
+  }
+
+  for (int i = 0; i < vertCount; i++)
+  {
+    float length = sqrt(model.normals[i].vec3[0] * model.normals[i].vec3[0] + model.normals[i].vec3[1] * model.normals[i].vec3[1] + model.normals[i].vec3[2] * model.normals[i].vec3[2]);
+    if (isnan(length) || length == 0.f)
+    {
+      model.normals[i].vec3[0] = 0.77f;
+      model.normals[i].vec3[1] = 0.77f;
+      model.normals[i].vec3[2] = 0.f;
+      continue;
+    }
+    model.normals[i].vec3[0] /= length;
+    model.normals[i].vec3[1] /= length;
+    model.normals[i].vec3[2] /= length;
+    length = sqrt(model.normals[i].vec3[0] * model.normals[i].vec3[0] + model.normals[i].vec3[1] * model.normals[i].vec3[1] + model.normals[i].vec3[2] * model.normals[i].vec3[2]);
+    if (isnan(length))
+    {
+      printf("error");
+    }
+
+  }
+
+  //Parse File And Load Data
+  vertItr = 0;
+  texcItr = 0;
+  faceItr = 0;
+  actvTex = 0;
+  newLine = true;
+  for (int fptr = 0; fptr < fileSize; fptr++)
+  {
+    if (newLine) //Determine This Lines type
+    {
+  
+      if (fileData[fptr] == 'f' & fileData[fptr + 1] == ' ')
+      {
+        lineType = 5; // Face
+        char d1[32];
+        char d2[32];
+        char d3[32];
+        sscanf((const char*)(fileData + fptr + 2), "%s %s %s", d1, d2, d3);
+        int v1 = 0;
+        int v2 = 0;
+        int v3 = 0;
+        sscanf(d1, "%d/", &v1);
+        sscanf(d2, "%d/", &v2);
+        sscanf(d3, "%d/", &v3);
+        //Store Faces Vertex Position Data
+        model.polys[faceItr].verticies[0].nx = model.normals[v1 - 1].vec3[0];
+        model.polys[faceItr].verticies[0].ny = model.normals[v1 - 1].vec3[1];
+        model.polys[faceItr].verticies[0].nz = model.normals[v1 - 1].vec3[2];
+  
+        model.polys[faceItr].verticies[1].nx = model.normals[v2 - 1].vec3[0];
+        model.polys[faceItr].verticies[1].ny = model.normals[v2 - 1].vec3[1];
+        model.polys[faceItr].verticies[1].nz = model.normals[v2 - 1].vec3[2];
+  
+        model.polys[faceItr].verticies[2].nx = model.normals[v3 - 1].vec3[0];
+        model.polys[faceItr].verticies[2].ny = model.normals[v3 - 1].vec3[1];
+        model.polys[faceItr].verticies[2].nz = model.normals[v3 - 1].vec3[2];
+        faceItr++;
       }
   
       if (lineType != 0)

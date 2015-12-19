@@ -33,9 +33,9 @@
 //Program name
 const char* PROGRAM_NAME = "ZELDA";
 //Window resolution
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-const bool FULL_SCEEN = false;
+const int SCREEN_WIDTH = 1024;
+const int SCREEN_HEIGHT = 768;
+const bool FULL_SCEEN = true;
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -48,6 +48,7 @@ GLuint gProgramID = 0;
 
 //Uniform Locations
 GLuint gLocMVP = -1;
+GLuint gLocDIR = -1;
 GLint gLocVertexPos4D = -1;
 GLuint gLocTexture = -1;
 
@@ -224,8 +225,13 @@ bool initGL()
   //Model View Projection Shader parameter
   gLocMVP = glGetUniformLocation(gProgramID, "MVP");
 
+  //Cam Angle
+  gLocDIR = glGetUniformLocation(gProgramID, "camDir");
+
   //Texture sampler
   gLocTexture = glGetUniformLocation(gProgramID, "TextureSampler");
+
+
 
   //Initialize clear color
   glClearColor(0.f, 0.75, 1.0, 1.f);
@@ -269,6 +275,10 @@ void render()
   Model = glm::rotate(Model, rot * -0.05f, glm::vec3(0.0, 1.0, 0.0));
   MVP = Projection * View * Model;
   glUniformMatrix4fv(gLocMVP, 1, GL_FALSE, &MVP[0][0]);
+
+  glm::vec3 cfv = getCameraForward();
+  glUniform3f(gLocDIR, cfv.x, cfv.y, cfv.z);
+
   RenderRenderObject(SkyRenderObject);
 
   //Reset camera and depth buffer
@@ -491,7 +501,7 @@ int wmain(int argc, char* argv[])
     SDL_GL_SwapWindow(gWindow);
 
     //Just in case Vsync fails!
-    //Sleep(15);
+    Sleep(15);
 
   }
 

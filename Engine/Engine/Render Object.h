@@ -141,25 +141,25 @@ RenderObject GenerateRenderObject(OBJ &model, MTL &materials)
         object.vertexObjects[objID].texPosData[currentFace * 6 + 4] = model.polys[faceID].verticies[2].u;
         object.vertexObjects[objID].texPosData[currentFace * 6 + 5] = model.polys[faceID].verticies[2].v;
 
-        //Normals
-        glm::vec3 V1 = glm::vec3(model.polys[faceID].verticies[0].x, model.polys[faceID].verticies[0].y, model.polys[faceID].verticies[0].z);
-        glm::vec3 V2 = glm::vec3(model.polys[faceID].verticies[1].x, model.polys[faceID].verticies[1].y, model.polys[faceID].verticies[1].z);
-        glm::vec3 V3 = glm::vec3(model.polys[faceID].verticies[2].x, model.polys[faceID].verticies[2].y, model.polys[faceID].verticies[2].z);
-        glm::vec3 Vert1 = V2 - V1;
-        glm::vec3 Vert2 = V3 - V1;
-        glm::vec3 Normal = glm::normalize(glm::cross(Vert1, Vert2));
+        ////Normals
+        //glm::vec3 V1 = glm::vec3(model.polys[faceID].verticies[0].x, model.polys[faceID].verticies[0].y, model.polys[faceID].verticies[0].z);
+        //glm::vec3 V2 = glm::vec3(model.polys[faceID].verticies[1].x, model.polys[faceID].verticies[1].y, model.polys[faceID].verticies[1].z);
+        //glm::vec3 V3 = glm::vec3(model.polys[faceID].verticies[2].x, model.polys[faceID].verticies[2].y, model.polys[faceID].verticies[2].z);
+        //glm::vec3 Vert1 = V2 - V1;
+        //glm::vec3 Vert2 = V3 - V1;
+        //glm::vec3 Normal = glm::normalize(glm::cross(Vert1, Vert2));
 
-        object.vertexObjects[objID].normPosData[currentFace * 9 + 0] = Normal.x;
-        object.vertexObjects[objID].normPosData[currentFace * 9 + 1] = Normal.y;
-        object.vertexObjects[objID].normPosData[currentFace * 9 + 2] = Normal.z;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 0] = model.polys[faceID].verticies[0].nx;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 1] = model.polys[faceID].verticies[0].ny;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 2] = model.polys[faceID].verticies[0].nz;
 
-        object.vertexObjects[objID].normPosData[currentFace * 9 + 3] = Normal.x;
-        object.vertexObjects[objID].normPosData[currentFace * 9 + 4] = Normal.y;
-        object.vertexObjects[objID].normPosData[currentFace * 9 + 5] = Normal.z;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 3] = model.polys[faceID].verticies[1].nx;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 4] = model.polys[faceID].verticies[1].ny;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 5] = model.polys[faceID].verticies[1].nz;
 
-        object.vertexObjects[objID].normPosData[currentFace * 9 + 6] = Normal.x;
-        object.vertexObjects[objID].normPosData[currentFace * 9 + 7] = Normal.y;
-        object.vertexObjects[objID].normPosData[currentFace * 9 + 8] = Normal.z;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 6] = model.polys[faceID].verticies[2].nx;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 7] = model.polys[faceID].verticies[2].ny;
+        object.vertexObjects[objID].normPosData[currentFace * 9 + 8] = model.polys[faceID].verticies[2].nz;
 
         object.vertexObjects[objID].verticeCount += 3;
         currentFace++;
