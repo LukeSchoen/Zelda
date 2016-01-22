@@ -101,3 +101,11 @@ glm::mat4 getCameraRotOnly()
   cam = glm::rotate(cam, camAng.y, glm::vec3(0, 1.0, 0));
   return cam;
 }
+
+glm::vec3 getCameraForward()
+{
+  glm::vec3 mov(0.0, 0.0, 1.0);
+  mov = glm::rotate(mov, 0 - camAng.x, glm::vec3(1.0, 0, 0));
+  mov = glm::rotate(mov, 0 - camAng.y, glm::vec3(0, 1.0, 0));
+  return mov;
+}

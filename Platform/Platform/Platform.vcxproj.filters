@@ -3,4 +3,7 @@
   <ItemGroup>
     <ClCompile Include="Platform.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Platform.h" />
+  </ItemGroup>
 </Project>

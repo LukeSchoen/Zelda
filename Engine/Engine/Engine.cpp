@@ -48,6 +48,7 @@ GLuint gProgramID = 0;
 
 //Uniform Locations
 GLuint gLocMVP = -1;
+GLuint gLocDIR = -1;
 GLint gLocVertexPos4D = -1;
 GLuint gLocTexture = -1;
 
@@ -224,6 +225,9 @@ bool initGL()
   //Model View Projection Shader parameter
   gLocMVP = glGetUniformLocation(gProgramID, "MVP");
 
+  //Cam Angle
+  gLocDIR = glGetUniformLocation(gProgramID, "camDir");
+
   //Texture sampler
   gLocTexture = glGetUniformLocation(gProgramID, "TextureSampler");
 
@@ -261,6 +265,10 @@ void render()
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
   glEnableVertexAttribArray(2);
+
+  //Camera Direction
+  glm::vec3 cfv = getCameraForward();
+  glUniform3f(gLocDIR, cfv.x, cfv.y, cfv.z);
 
   //sky
   View = getCameraRotOnly();

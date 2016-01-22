@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5BF8A5BF-BFF6-47A7-8B62-42DE505E2BFB}</ProjectGuid>
+    <ProjectGuid>{A6D0CACF-E7EA-42A4-84CB-0BCB1647088A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SDL_GLSL</RootNamespace>
     <ProjectName>Platform</ProjectName>
@@ -90,7 +90,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\Engine\Engine\;$(ProjectDir)..\..\Engine\3rdParty\glm;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\Engine\;$(ProjectDir)..\..\3rdParty\glm\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -109,7 +109,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\Engine\Engine\;$(ProjectDir)..\..\Engine\3rdParty\glm;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\Engine\;$(ProjectDir)..\..\3rdParty\glm\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,7 +130,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\Engine\Engine\;$(ProjectDir)..\..\Engine\3rdParty\glm;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\Engine\;$(ProjectDir)..\..\3rdParty\glm\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,7 +153,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\Engine\Engine\;$(ProjectDir)..\..\Engine\3rdParty\glm;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\Engine\;$(ProjectDir)..\..\3rdParty\glm\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -171,9 +171,12 @@
     <ClCompile Include="Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Engine\Engine\Engine\Engine.vcxproj">
-      <Project>{039f3f05-04aa-450e-b3a8-bf101e7c36f3}</Project>
+    <ProjectReference Include="..\..\Engine\Engine\Engine.vcxproj">
+      <Project>{1077ad42-9695-43e4-b3d8-1e0ad217418c}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Platform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
