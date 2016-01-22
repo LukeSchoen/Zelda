@@ -1,6 +1,43 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Zelda.cpp" />
+    <ClCompile Include="Game.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Actors">
+      <UniqueIdentifier>{f5d27586-ab95-4a0c-9767-502f30c4a3f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{76934869-2951-455c-b1a4-ebba9ef25af8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actors\Mobs">
+      <UniqueIdentifier>{b9469c66-b6a2-45f5-833c-c3781ab9e067}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actors\NPCs">
+      <UniqueIdentifier>{b5406d1c-d4eb-4c60-be99-f4b711a1b6cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actors\Maps">
+      <UniqueIdentifier>{219d5e31-7a36-409c-a9a8-79d8a65f2d34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\World">
+      <UniqueIdentifier>{e1584c57-4353-4eaa-babe-06f4f3ed092e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\Menu">
+      <UniqueIdentifier>{04317188-ac35-497b-84b7-5a15837a1da2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Actors.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenes.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Chicken.h">
+      <Filter>Actors\Mobs</Filter>
+    </ClInclude>
+    <ClInclude Include="OverWorld.h">
+      <Filter>Scenes\World</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

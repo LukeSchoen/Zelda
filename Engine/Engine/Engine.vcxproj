@@ -19,33 +19,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5BF8A5BF-BFF6-47A7-8B62-42DE505E2BFB}</ProjectGuid>
+    <ProjectGuid>{1077AD42-9695-43E4-B3D8-1E0AD217418C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SDL_GLSL</RootNamespace>
     <ProjectName>Engine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -70,18 +70,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -98,8 +102,11 @@
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\VisualC\SDL\$(Platform)\$(Configuration)\SDL2.dll" "$(ProjectDir)$(Platform)\$(Configuration)\" /i /y</Command>
+      <Command>xcopy "$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\VisualC\SDL\$(Platform)\$(Configuration)\SDL2.dll" "$(SolutionDir)..\Output\$(Platform)\$(Configuration)\" /i /y</Command>
     </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>opengl32.lib;</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -116,8 +123,11 @@
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\VisualC\SDL\$(Platform)\$(Configuration)\SDL2.dll" "$(ProjectDir)$(Platform)\$(Configuration)\" /i /y</Command>
+      <Command>xcopy "$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\VisualC\SDL\$(Platform)\$(Configuration)\SDL2.dll" "$(SolutionDir)..\Output\$(Platform)\$(Configuration)\" /i /y</Command>
     </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>opengl32.lib;</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -129,6 +139,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\include;$(ProjectDir)..\..\3rdParty\glew-1.13.0\include;$(ProjectDir)..\..\3rdParty\glm</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,8 +149,11 @@
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\VisualC\SDL\$(Platform)\$(Configuration)\SDL2.dll" "$(ProjectDir)$(Platform)\$(Configuration)\" /i /y</Command>
+      <Command>xcopy "$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\VisualC\SDL\$(Platform)\$(Configuration)\SDL2.dll" "$(SolutionDir)..\Output\$(Platform)\$(Configuration)\" /i /y</Command>
     </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>opengl32.lib;</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,6 +165,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\include;$(ProjectDir)..\..\3rdParty\glew-1.13.0\include;$(ProjectDir)..\..\3rdParty\glm</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,18 +175,24 @@
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\VisualC\SDL\$(Platform)\$(Configuration)\SDL2.dll" "$(ProjectDir)$(Platform)\$(Configuration)\" /i /y</Command>
+      <Command>xcopy "$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\VisualC\SDL\$(Platform)\$(Configuration)\SDL2.dll" "$(SolutionDir)..\Output\$(Platform)\$(Configuration)\" /i /y</Command>
     </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>opengl32.lib;</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)..\3rdParty\SDL2-2.0.3\include;$(SolutionDir)..\3rdParty\glew-1.13.0\include;$(SolutionDir)..\3rdParty\glm</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)..\3rdParty\SDL2-2.0.3\include;$(SolutionDir)..\3rdParty\glew-1.13.0\include;$(SolutionDir)..\3rdParty\glm</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="Memory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap Loader.h" />
     <ClInclude Include="Controls.h" />
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="Memory.h" />
     <ClInclude Include="OBJ Loader.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="Render Object.h" />
