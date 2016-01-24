@@ -7,13 +7,11 @@
 
 struct _Entity;
 
-using namespace Platform;
-
-struct _Actor : Actor
+struct _Actor : Platform::Actor
 {
   _Actor::_Actor(char* name, glm::vec3 position = { 0, 0, 0 }, glm::vec3 rotation = { 0, 0, 0 }, glm::vec3 scale = { 0, 0, 0 });
 
-  void AddEntity(Entity* entity);
+  void AddEntity(Platform::Entity* entity);
 
   str m_name;
   glm::vec3 m_position;

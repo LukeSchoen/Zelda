@@ -4,15 +4,13 @@
 #include "String.h"
 #include "Platform.h"
 
-using namespace Platform;
-
 struct _Actor;
 
-struct _Scene : Scene
+struct _Scene : Platform::Scene
 {
   _Scene(char* name);
 
-  void AddActor(Actor* actor);
+  void AddActor(Platform::Actor* actor);
 
   str m_name;
   _Actor **m_actors;

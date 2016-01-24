@@ -26,19 +26,14 @@
 #include "Shader Loader.h"
 #include "Controls.h"
 
+#include "..\..\Platform\Platform\platformInternal.h"
+
 #pragma endregion
 
 namespace Engine
 {
 
 #pragma region globals
-
-  //Program name
-  const char* PROGRAM_NAME = "ZELDA";
-  //Window resolution
-  const int SCREEN_WIDTH = 640;
-  const int SCREEN_HEIGHT = 480;
-  const bool FULL_SCEEN = false;
 
   //The window we'll be rendering to
   SDL_Window* gWindow = NULL;
@@ -80,7 +75,7 @@ namespace Engine
 
 #pragma endregion
 
-  bool Initialize()
+  bool Initialize(Window& window)
   {
     //Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -99,7 +94,7 @@ namespace Engine
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
     //Create window
-    gWindow = SDL_CreateWindow(PROGRAM_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    gWindow = SDL_CreateWindow(window.m_title.m_buffer, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window.m_width, window.m_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     if (gWindow == NULL)
     {
       printf("Error: Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -140,7 +135,7 @@ namespace Engine
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
     //Go Full screen?
-    if (FULL_SCEEN) SDL_SetWindowFullscreen(gWindow, SDL_WINDOW_FULLSCREEN);
+    if (window.m_fullscreen) SDL_SetWindowFullscreen(gWindow, SDL_WINDOW_FULLSCREEN);
 
     //Successful init
     return true;
@@ -151,6 +146,7 @@ namespace Engine
     //Depth Testing
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
 
     //Multi sampling
     glEnable(GL_MULTISAMPLE);
@@ -393,10 +389,10 @@ namespace Engine
     }
   }
 
-  void Start()
+  void Start(Game* const game)
   {
     //Start SDL & Create Window
-    if (!Initialize())
+    if (!Initialize(game->m_window))
     {
       printf("Failed to initialize!\n");
       getchar();

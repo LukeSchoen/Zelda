@@ -5,17 +5,15 @@
 #include "Window.h"
 #include "platform.h"
 
-using namespace Platform;
-
 struct _Scene;
 
-struct _Game : Game
+struct _Game : Platform::Game
 {
   _Game(char* name);
 
-  void SetDisplayMode(char * title = nullptr, int width = 800, int height = 600, bool fullscreen = false);
+  void SetDisplayMode(char * title, int width, int height, bool fullscreen);
 
-  void AddScene(Scene* scene);
+  void AddScene(Platform::Scene* scene);
 
   void BeginGame();
 

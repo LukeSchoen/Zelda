@@ -2,6 +2,8 @@
 #include "Component.h"
 #include "Memory.h"
 
+using namespace Platform;
+
 _Entity::_Entity(char* name)
   : m_name(name)
   , m_components(nullptr)

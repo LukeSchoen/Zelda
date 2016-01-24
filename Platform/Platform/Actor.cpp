@@ -2,6 +2,8 @@
 #include "Memory.h"
 #include "Entity.h"
 
+using namespace Platform;
+
 _Actor::_Actor(char* name, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
   : m_name(name)
   , m_entities(nullptr)

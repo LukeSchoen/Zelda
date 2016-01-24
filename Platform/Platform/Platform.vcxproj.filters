@@ -47,7 +47,8 @@
     <ClInclude Include="Game.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="TestJunk.h" />
+    <ClInclude Include="Test.h" />
+    <ClInclude Include="PlatformInternal.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Window">

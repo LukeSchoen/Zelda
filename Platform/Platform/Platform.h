@@ -40,7 +40,7 @@ namespace Platform
     virtual void AddScene(Scene* scene) = 0;
     Scene* AddScene(char* name);
     virtual void BeginGame() = 0;
-    virtual void SetDisplayMode(char* Title, int width, int height, bool fullScreen) = 0;
+    virtual void SetDisplayMode(char* Title, int width = 800, int height = 600, bool fullScreen = false) = 0;
   };
 
   Component* CreateComponent(char* name);

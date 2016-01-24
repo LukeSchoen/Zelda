@@ -4,15 +4,13 @@
 #include "String.h"
 #include "Platform.h"
 
-using namespace Platform;
-
 struct _Component;
 
-struct _Entity : Entity
+struct _Entity : Platform::Entity
 {
   _Entity(char* name);
 
-  void AddComponent(Component* component);
+  void AddComponent(Platform::Component* component);
 
   str m_name;
   _Component **m_components;

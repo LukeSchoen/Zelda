@@ -2,6 +2,8 @@
 #include "Memory.h"
 #include "Engine.h"
 
+using namespace Platform;
+
 _Game::_Game(char* name)
   : m_name(name)
   , m_window(name)
@@ -15,7 +17,7 @@ void _Game::SetDisplayMode(char * title, int width, int height, bool fullscreen)
 {
   if (title != nullptr)
     m_window.m_title.copy(title);
-  m_window.m_with = width;
+  m_window.m_width = width;
   m_window.m_height = height;
   m_window.m_fullscreen = fullscreen;
 }
@@ -30,10 +32,9 @@ void _Game::BeginGame()
 {
   //Initialize Engine
   // window information
-  Engine::Start();
 
   //Start Engine
-  Engine::Start();
+  Engine::Start(this);
 
   //Enging ends->
   //Cleanup platform

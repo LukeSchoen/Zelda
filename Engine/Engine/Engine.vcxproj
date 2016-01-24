@@ -94,7 +94,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\include;$(ProjectDir)..\..\3rdParty\glew-1.13.0\include;$(ProjectDir)..\..\3rdParty\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\khanm_000\Desktop\Zelda\Platform\Platform;$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\include;$(ProjectDir)..\..\3rdParty\glew-1.13.0\include;$(ProjectDir)..\..\3rdParty\glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,7 +115,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\include;$(ProjectDir)..\..\3rdParty\glew-1.13.0\include;$(ProjectDir)..\..\3rdParty\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\khanm_000\Desktop\Zelda\Platform\Platform;$(ProjectDir)..\..\3rdParty\SDL2-2.0.3\include;$(ProjectDir)..\..\3rdParty\glew-1.13.0\include;$(ProjectDir)..\..\3rdParty\glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

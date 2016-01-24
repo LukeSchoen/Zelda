@@ -5,9 +5,6 @@
 #include "Platform.h"
 #include <cstdint>
 
-using namespace  Platform;
-
-
 enum ComponentType
 {
   CT_CUSTOM = 0,
@@ -15,7 +12,7 @@ enum ComponentType
 
 void whatever(ComponentType a);
 
-struct _Component : Component
+struct _Component : Platform::Component
 {
   _Component(char* name);
 

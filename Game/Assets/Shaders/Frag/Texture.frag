@@ -37,6 +37,7 @@ void main()
 	skyLight = skyLight * skyLight * skyLight * skyLight * skyLight;
 	skyLight *= camLight+0.25;
 
+
 	camLight = camLight * camLight * camLight * camLight;
 	
 	//float light = max(skyLight, camLight);
@@ -45,9 +46,11 @@ void main()
 	light = min(light , 1);
 	
 	//Put into SRGB
-	c = sqrt(c * light);
-	
-	color = c;
+	c = c * light;
+
+	c = mix(c, vec3(0.85,1,1), min( max(DEPTH-10, 0) / 60.0,1));
+
+	color = sqrt(c);
 
 	color = saturation(color, 1.75);
 

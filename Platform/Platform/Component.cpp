@@ -1,6 +1,6 @@
 #include "Component.h"
 
-
+using namespace Platform;
 
 
 _Component::_Component(char* name)

@@ -2,6 +2,8 @@
 #include "Actor.h"
 #include "Memory.h"
 
+using namespace Platform;
+
 _Scene::_Scene(char* name)
   : m_name(name)
   , m_actors(nullptr)

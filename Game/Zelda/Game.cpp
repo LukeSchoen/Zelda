@@ -27,7 +27,7 @@ int wmain()
   zelda->AddScene(overworld);
   ////                  ////
 
-  zelda->SetDisplayMode("zelda application", 800, 600, false);
+  zelda->SetDisplayMode("zelda application", 1280,768);
 
   zelda->BeginGame();
 
