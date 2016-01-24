@@ -19,7 +19,9 @@ vec3 saturation(vec3 rgb, float adjustment)
 void main()
 {
 
-	vec3 c = texture( TextureSampler, vec2(UV.x, 1.0 - UV.y) ).rgb;
+	vec2 texSize = textureSize(TextureSampler,0);
+	
+	vec3 c = texture( TextureSampler, vec2(UV.x + 0.5 / texSize.x, 1.0 - (UV.y + 0.5 / texSize.x)) ).rgb;
 	
 	//Take out of SRGB
 	c = c * c;
