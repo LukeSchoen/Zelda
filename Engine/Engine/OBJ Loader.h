@@ -54,7 +54,7 @@ int MaterialNameToTexture(char* materialName, MTL &mtl)
 {
   for (int matID = 0; matID < mtl.materialCount ; matID++)
   {
-    if (strcmp(mtl.materials[matID].name, materialName) == 0)
+    if (str::compare(mtl.materials[matID].name, materialName))
     {
       return mtl.materials[matID].textureID;
     }
@@ -173,14 +173,14 @@ MTL LoadMTL(char* path)
         lineType = 3; // Diffusive Map
         //Write Name
         sscanf((const char*)(fileData + fptr + 7), "%s", materialPath);
-        MTL.materials[materialItr].name = new char[strlen(materialName) + 1];
-        memcpy(MTL.materials[materialItr].name, materialName, strlen(materialName));
-        MTL.materials[materialItr].name[strlen(materialName)] = NULL;
+        MTL.materials[materialItr].name = new char[str::length(materialName)];
+        memcopy(MTL.materials[materialItr].name, materialName, str::length(materialName)-1);
+        MTL.materials[materialItr].name[str::length(materialName)-1] = NULL;
 
         //Write Path
-        MTL.materials[materialItr].path = new char[strlen(materialPath) + 1];
-        memcpy(MTL.materials[materialItr].path, materialPath, strlen(materialPath));
-        MTL.materials[materialItr].path[strlen(materialPath)] = NULL;
+        MTL.materials[materialItr].path = new char[str::length(materialPath)];
+        memcopy(MTL.materials[materialItr].path, materialPath, str::length(materialPath)-1);
+        MTL.materials[materialItr].path[str::length(materialPath)-1] = NULL;
         materialItr++;
         MTL.materialCount++;
       }

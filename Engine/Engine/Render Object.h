@@ -27,11 +27,11 @@ void InitializeMaterialLibrary(MTL &mtl, char * basePath)
 {
   SDL_Surface *tex;
   char fullMatPath[1024];
-  memcpy(fullMatPath, basePath, strlen(basePath) + 1); // initialize the base path
+  memcopy(fullMatPath, basePath, str::length(basePath)); // initialize the base path
 
   for (int matID = 0; matID < mtl.materialCount; matID++)
   {
-    memcpy(fullMatPath + strlen(basePath), mtl.materials[matID].path, strlen(mtl.materials[matID].path) + 1); // append the local material path
+    memcopy(fullMatPath + str::length(basePath) - 1, mtl.materials[matID].path, str::length(mtl.materials[matID].path)); // append the local material path
 
     if ((tex = SDL_LoadBMP(fullMatPath)))
     {
@@ -186,7 +186,7 @@ RenderObject GenerateRenderObject(OBJ &model, MTL &materials)
 RenderObject GenerateRenderObject(char* modelPath)
 {
   //Determine Paths
-  int pathLen = strlen(modelPath);
+  int pathLen = str::length(modelPath)-1;
   char * basePath;
   for (int c = pathLen - 1; c >= 0; c--)
   {
@@ -199,9 +199,9 @@ RenderObject GenerateRenderObject(char* modelPath)
     }
   }
   char* mtlName = ExtractMTLName(modelPath);
-  char * mtlPath = new char[strlen(basePath) + strlen(mtlName) + 1];
-  memcpy(mtlPath, basePath, strlen(basePath));
-  memcpy(mtlPath + strlen(basePath), mtlName, strlen(mtlName) + 1);
+  char * mtlPath = new char[str::length(basePath)-1 + str::length(mtlName)];
+  memcopy(mtlPath, basePath, str::length(basePath)-1);
+  memcopy(mtlPath + str::length(basePath)-1, mtlName, str::length(mtlName));
   mtlPath = mtlPath;
   //Load Data
   MTL MODELMTL = LoadMTL(mtlPath);

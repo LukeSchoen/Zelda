@@ -4,11 +4,17 @@
 
 #pragma endregion
 
+#define memcpy memcopy
+#define memcmp memcompare
+
 #pragma region includes
+#include "platformInternal.h"
+#include "Memory.h"
+#include "String.h"
 
 #include <stdio.h>
-#include <string>
-#include <tchar.h>
+//#include <string>
+//#include <tchar.h>
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -25,8 +31,6 @@
 #include "Render Object.h"
 #include "Shader Loader.h"
 #include "Controls.h"
-
-#include "..\..\Platform\Platform\platformInternal.h"
 
 #pragma endregion
 
@@ -498,7 +502,7 @@ namespace Engine
       SDL_GL_SwapWindow(gWindow);
 
       //Just in case Vsync fails!
-      //Sleep(15);
+      Sleep(15);
 
     }
 

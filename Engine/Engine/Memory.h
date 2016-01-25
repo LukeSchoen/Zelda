@@ -20,4 +20,6 @@ char* memalloc(int length);
 
 void memcopy(void *dst, void *src, int len);
 
+int memcompare(const void *src1, const void *src2, size_t len);
+
 #endif // Memory_h__

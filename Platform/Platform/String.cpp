@@ -27,3 +27,17 @@ int str::length(char* string)
     if (string[i] == NULL)
       return i+1;
 }
+
+bool str::compare(char* string1, char* string2)
+{
+  if (string1 == nullptr || string2 == nullptr)
+    return false;
+  for (int i = 0; true; i++)
+  {
+    if (string1[i] != string2[i])
+      return false;
+    if (string1[i] == NULL && string2[i] == NULL)
+      return true;
+  }
+
+}
